@@ -6,6 +6,9 @@
 2. Compile and run the App from VS Code (Java Extension Pack may need to be installed)
 
 
+## Documentation
+Documentation of reaserch, tools, and ideas for both projects can be found here in 'Documentation' folder
+
 
 
 
