@@ -175,7 +175,7 @@ class KarnaughTable
                 return ReplacementSource.Improper;
         }
     }
-    /*public int[][] PossibleMoves(int move[])
+    /*public Coord[] PossibleMoves(Coord move)
     {
 
     }*/
