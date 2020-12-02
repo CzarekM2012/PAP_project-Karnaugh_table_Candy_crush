@@ -1,38 +1,61 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 class KarnaughTable
 {
-    int xDimension, yDimension, FieldValuesNumber;
-    int toGrey[];
-    Set<ReplacementSource> replacementSourcessSet;
-    Field board[][];
-    public KarnaughTable(int BitsNumber, int FieldValuesNumber, Set<ReplacementSource> replacementSourcessSet)
+    private int xSize, ySize, FieldValuesNumber;
+    private int indexToGrey[], greyToIndex[];
+    private Set<ReplacementSource> replacementSourcesSet;
+    private Field board[][];
+    public KarnaughTable(int BitsNumber, int FieldValuesNumber, Set<ReplacementSource> replacementSourcesSet) throws IllegalArgumentException
     {
-        if(BitsNumber<=CountBits(Integer.MAX_VALUE)*2);
+        if(BitsNumber<=CountBits(Integer.MAX_VALUE)*2 && FieldValuesNumber>0 && !replacementSourcesSet.isEmpty() && !replacementSourcesSet.contains(ReplacementSource.Improper))
         {
             int xPow=BitsNumber/2, yPow=xPow;
-            if((BitsNumber&1)==1)
-            {
-                xPow++;
-            }
-            this.xDimension = (int)Math.pow(2, xPow);
-            this.yDimension = (int)Math.pow(2, yPow);
-            this.toGrey = new int[xDimension];
+            xPow+=BitsNumber&1;
+            this.xSize = 1<<xPow; //left shift - equivalent to (int)math.pow(2, xPow);
+            this.ySize = 1<<yPow;
+            this.indexToGrey = new int[xSize];
+            this.greyToIndex = new int[xSize];
             SetupArrayIndexToGreyCode();
-            this.FieldValuesNumber = FieldValuesNumber;
-            this.replacementSourcessSet = replacementSourcessSet;
-            this.board = new Field[xDimension][yDimension];
-            for(int i=0; i<xDimension; i++)
+            for(int i=0; i<xSize; i++)
             {
-                for(int j=0; j<yDimension; j++)
+                greyToIndex[indexToGrey[i]] = i;
+            }
+            this.FieldValuesNumber = FieldValuesNumber;
+            this.replacementSourcesSet = replacementSourcesSet;
+            this.board = new Field[xSize][ySize];
+            for(int i=0; i<xSize; i++)
+            {
+                for(int j=0; j<ySize; j++)
                 {
                     board[i][j] = new Field();
                 }
             }
             FillWithRandoms();
+        }
+        else
+        {
+            if(BitsNumber>CountBits(Integer.MAX_VALUE)*2)
+            {
+                throw new IllegalArgumentException("BitsNumber cannot be higher than 2*number_of_bits_in_Integer.MAX_VALUE");
+            }
+            if(FieldValuesNumber<=0)
+            {
+                throw new IllegalArgumentException("FieldValuesNumber needs to be higher than 0");
+            }
+            if(replacementSourcesSet.isEmpty())
+            {
+                throw new IllegalArgumentException("replacementSources cannot be empty");
+            }
+            else if(replacementSourcesSet.contains(ReplacementSource.Improper))
+            {
+                throw new IllegalArgumentException("replacementSourcesSet cannot contain ReplacementSource.Improper");
+            }
         }
     }
     private int CountBits(int number)
@@ -41,36 +64,36 @@ class KarnaughTable
         while(number!=0)
         {
             bits+=(number&1);
-            number>>>=1; //zero-fill right shift
+            number>>>=1; //new Field(0, ReplacementSource.Top)-fill right shift
         }
         return bits;
     }
     private void SetupArrayIndexToGreyCode()
     {
-        toGrey[0]=0;
-        toGrey[1]=1;
+        indexToGrey[0]=0;
+        indexToGrey[1]=1;
         int leftMostBit = 2, j=1;;
-        for(int i=2; i<xDimension; i++)
+        for(int i=2; i<xSize; i++)
         {
             if(CountBits(i)==1)
             {
                 leftMostBit=i;
                 j=i-1;
             }
-            toGrey[i] = leftMostBit + toGrey[j];
+            indexToGrey[i] = leftMostBit + indexToGrey[j];
             j--;
         }
     }
     private void FillWithRandoms()
     {
         Random generator = new Random();
-        int size = replacementSourcessSet.size();
+        int size = replacementSourcesSet.size();
         ReplacementSource array[] = new ReplacementSource[size];
-        replacementSourcessSet.toArray(array);
+        replacementSourcesSet.toArray(array);
         Field emptyField = new Field();
-        for(int i=0; i<xDimension; i++)
+        for(int i=0; i<xSize; i++)
         {
-            for(int j=0; j<yDimension; j++)
+            for(int j=0; j<ySize; j++)
             {
                 if(board[i][j].equals(emptyField))
                 {
@@ -80,11 +103,13 @@ class KarnaughTable
         }
     }
     public Coord[][] Collapse(ReplacementSource replacementSource)
+    //moves fields in the direction opposite to the direction indicated by the replacementSource
+    //(if replacementSource equals ReplacementSource.Top, fields will be moving down, etc.), if there are empty fields in that direction
     {
-        Coord fieldsMovementBoard[][] = new Coord[xDimension][yDimension];
-        for(int i=0; i<xDimension; i++)
+        Coord fieldsMovementBoard[][] = new Coord[xSize][ySize];
+        for(int i=0; i<xSize; i++)
         {
-            for(int j=0; j<yDimension; j++)
+            for(int j=0; j<ySize; j++)
             {
                 fieldsMovementBoard[i][j] = new Coord();
             }
@@ -94,36 +119,36 @@ class KarnaughTable
         switch(replacementSource.id)
         {
             case 1://Spawn at top -> collapse down
-                currentPosition=new Coord(0, yDimension-2);
+                currentPosition=new Coord(0, ySize-2);
                 move=new Coord(1,0);
-                nextLine=new Coord(-xDimension, -1);
+                nextLine=new Coord(-xSize, -1);
                 fall=new Coord(0, 1);
                 break;
             case 2://spawn at bottom -> collapse up
                 currentPosition=new Coord(0, 1);
                 move=new Coord(1,0);
-                nextLine=new Coord(-xDimension, 1);
+                nextLine=new Coord(-xSize, 1);
                 fall=new Coord(0, -1);
                 break;
             case 3://spawn at left -> collapse right
-                currentPosition=new Coord(xDimension-2, 0);
+                currentPosition=new Coord(xSize-2, 0);
                 move=new Coord(0, 1);
-                nextLine=new Coord(-1, -yDimension);
+                nextLine=new Coord(-1, -ySize);
                 fall=new Coord(1, 0);
                 break;
             default://4-spawn at right -> collapse left
                 currentPosition=new Coord(1, 0);
                 move=new Coord(0, 1);
-                nextLine=new Coord(1, -yDimension);
+                nextLine=new Coord(1, -ySize);
                 fall=new Coord(-1, 0);
                 break;
         }
-        while(currentPosition.x>=0 && currentPosition.x<xDimension && currentPosition.y>=0 && currentPosition.y<yDimension)
+        while(currentPosition.x>=0 && currentPosition.x<xSize && currentPosition.y>=0 && currentPosition.y<ySize)
         {
             collapser.set(currentPosition.x + fall.x, currentPosition.y + fall.y);
             if(!board[currentPosition.x][currentPosition.y].equals(clearField) && board[collapser.x][collapser.y].equals(clearField))
             {
-                while(collapser.x>0 && collapser.x<xDimension-1 && collapser.y>0 && collapser.y<yDimension-1 && board[collapser.x + fall.x][collapser.y + fall.y].equals(clearField))
+                while(collapser.x>0 && collapser.x<xSize-1 && collapser.y>0 && collapser.y<ySize-1 && board[collapser.x + fall.x][collapser.y + fall.y].equals(clearField))
                 {
                     collapser.addTo(fall);
                 }
@@ -133,24 +158,48 @@ class KarnaughTable
                 fieldsMovementBoard[currentPosition.x][currentPosition.y].set(collapser.x, collapser.y);
             }
             currentPosition.addTo(move);
-            if(currentPosition.x==xDimension || currentPosition.y==yDimension)
+            if(currentPosition.x==xSize || currentPosition.y==ySize)
             {
                 currentPosition.addTo(nextLine);
             }
         }
         return fieldsMovementBoard;
     }
-    /*private boolean IsMovePossible()
+    public boolean IsMovePossible()
+    //returns true if, there is field that has 2 adjacent fields with the same value, false otherwise
     {
-
-    }*/
-    public ReplacementSource DestroyFields(Coord array[])
+        int valuesCountArray[] = new int[this.FieldValuesNumber];
+        for(int i=0; i<xSize; i++)
+        {
+            for(int j=0; j<ySize; j++)
+            {
+                List<Coord> neighbours = AdjacentFields(new Coord(i, j));
+                for(int k=0; k<neighbours.size(); k++)
+                {
+                    Coord neighbour = neighbours.get(k); 
+                    valuesCountArray[board[neighbour.x][neighbour.y].value]++;
+                }
+                for(int k=0; k<this.FieldValuesNumber; k++)
+                {
+                    if(valuesCountArray[k]>=2)
+                    {
+                        return true;
+                    }
+                    valuesCountArray[k] = 0;
+                }
+            }
+        }
+        return false;
+    }
+    public ReplacementSource DestroyFields(List<Coord> list)
+    //clears fields at Coords in list and returns value of ReplacementSource that described most of them
     {
         int replacementSourcesCounts[] = {0,0,0,0,0};
-        for(int i=0; i<array.length; i++)
+        for(int i=0; i<list.size(); i++)
         {
-            replacementSourcesCounts[board[array[i].x][array[i].y].replacementSource.id]++;
-            board[array[i].x][array[i].y].clear();
+            Coord destroyed = list.get(i);
+            replacementSourcesCounts[board[destroyed.x][destroyed.y].replacementSource.id]++;
+            board[destroyed.x][destroyed.y].clear();
         }
         int max=0, index=0;
         for(int i=1; i<5; i++)
@@ -175,15 +224,98 @@ class KarnaughTable
                 return ReplacementSource.Improper;
         }
     }
-    /*public Coord[] PossibleMoves(Coord move)
+    public List<Coord> AdjacentFields(Coord startCoord)
+    //returns list of Coords of fields adjacent to field at startCoord according to Karnaugh table rules
     {
+        List <Coord> destinatitionList = new ArrayList<Coord>();
+        Coord greyStartCoord = new Coord(indexToGrey[startCoord.x], indexToGrey[startCoord.y]);
+        int modifier = indexToGrey[xSize-1]; //singular leftmost '1' bit for index representations in Grey code for X-axis
+        /*
+        ^ - XOR operator:
+        True  ^ True  -> False
+        True  ^ False -> True
+        False ^ True  -> True
+        False ^ False -> False
+        */
+        while(modifier != 0)
+        {
+            destinatitionList.add(new Coord(greyToIndex[greyStartCoord.x ^ modifier], startCoord.y));
+            modifier>>>=1;
+        }
+        modifier = indexToGrey[ySize-1]; //singular leftmost '1' bit for index representations in Grey code for Y-axis
+        while(modifier != 0)
+        {
+            destinatitionList.add(new Coord(startCoord.x, greyToIndex[greyStartCoord.y ^ modifier]));
+            modifier>>>=1;
+        }
+        return destinatitionList;
+    }
+    public List<Coord> FieldsToDestroy(Coord moveCoord)
+    {
+        //returns list containing coords of every field to be destroyed together with field at moveCoord
+        int moveFieldValue = board[moveCoord.x][moveCoord.y].value;
+        List<Coord> fieldsToDestroy = new ArrayList<Coord>();
+        Coord greyMoveCoord = new Coord(indexToGrey[moveCoord.x], indexToGrey[moveCoord.y]);
+        List<ArrayList<Coord>> fieldsCollections = new ArrayList<ArrayList<Coord>>();
 
-    }*/
+        List<Coord> collectionPotentialNewFields = new ArrayList<Coord>();
+        Coord greyDifference = new Coord();
+        List<Coord> adjacentsToMoveCoord = AdjacentFields(moveCoord);
+        for(int i=0; i<adjacentsToMoveCoord.size(); i++)
+        {
+            Coord neighour = adjacentsToMoveCoord.get(i);
+            if(moveFieldValue == board[neighour.x][neighour.y].value)
+            {
+                greyDifference.set(greyMoveCoord.x ^ indexToGrey[neighour.x], greyMoveCoord.y ^ indexToGrey[neighour.y]); //get bit that differs between field an moveCoord from its neighbour
+                boolean belongsToAnyExistingCollection = false; //we will need to create new collection
+                for(int j=0; j<fieldsCollections.size(); j++)
+                {
+                    boolean belongsToThisCollection = true;
+                    int k=0, elements=fieldsCollections.get(j).size();
+                    while(belongsToThisCollection && k<elements)
+                    {
+                        Coord inspected = new Coord(fieldsCollections.get(j).get(k));
+                        // transform inspected to Grey code, change bit pointed by greyDifference and change to index
+                        inspected.set(greyToIndex[indexToGrey[inspected.x] ^ greyDifference.x], greyToIndex[indexToGrey[inspected.y] ^ greyDifference.y]);
+                        if(board[inspected.x][inspected.y].value != moveFieldValue)
+                        {
+                            belongsToThisCollection = false;
+                        }
+                        collectionPotentialNewFields.add(inspected);
+                        k++;
+                    }
+                    if(belongsToThisCollection)
+                    {
+                        belongsToAnyExistingCollection = true; //no need to create new collection anymore
+                        fieldsCollections.get(j).addAll(collectionPotentialNewFields);
+                    }
+                    collectionPotentialNewFields.clear();
+                }
+                if(!belongsToAnyExistingCollection)
+                {
+                    fieldsCollections.add(new ArrayList<Coord>(Arrays.asList(moveCoord, neighour)));
+                }
+            }
+        }
+
+        for(int i=0; i<fieldsCollections.size(); i++)
+        {
+            for(int j=0; j<fieldsCollections.get(i).size(); j++)
+            {
+                Coord inspected = fieldsCollections.get(i).get(j);
+                if(!fieldsToDestroy.contains(inspected))
+                {
+                    fieldsToDestroy.add(inspected);
+                }
+            }
+        }
+        return fieldsToDestroy;
+    }
     public void Print()
     {
-        for(int i=0; i<yDimension; i++)
+        for(int i=0; i<ySize; i++)
         {
-            for(int j=0; j<xDimension; j++)
+            for(int j=0; j<xSize; j++)
             {
                 System.out.print(board[j][i].value);
                 switch(board[j][i].replacementSource.id)
@@ -208,8 +340,35 @@ class KarnaughTable
             System.out.println();
         }
     }
+    public void set(Coord coord, Field field) throws IndexOutOfBoundsException
+    {
+        board[coord.x][coord.y].set(field);
+    }
+    public void set(Field[][] newBoard) throws IndexOutOfBoundsException
+    {
+        for(int i=0; i<xSize; i++)
+        {
+            for(int j=0; j<ySize; j++)
+            {
+                board[i][j].set(newBoard[i][j]);
+            }
+        }
+    }
+    public Field[][] get()
+    {
+        Field[][] copy = new Field[xSize][ySize];
+        for(int i=0; i<xSize; i++)
+        {
+            for(int j=0; j<ySize; j++)
+            {
+                copy[i][j] = new Field(board[i][j]);
+            }
+        }
+        return copy;
+    }
     public static void main(String args[])
     {
+        //testing area, erase later
         Set<ReplacementSource> temp = new HashSet<ReplacementSource>();
         temp.addAll(Arrays.asList(new ReplacementSource[] {ReplacementSource.Top, ReplacementSource.Bottom}));
         temp.addAll(Arrays.asList(new ReplacementSource[] {}));
@@ -221,13 +380,40 @@ class KarnaughTable
         array[1] = new Coord(1, 2);
         array[2] = new Coord(2, 1);
         array[3] = new Coord(2, 2);
-        ReplacementSource spawnDirection=test.DestroyFields(array);
+        ReplacementSource spawnDirection=test.DestroyFields(Arrays.asList(array));
         test.Print();
         System.out.println();
         test.Collapse(spawnDirection);
         test.Print();
         System.out.println();
         test.FillWithRandoms();
+        List<Coord> possibleMoves = test.AdjacentFields(new Coord(1,1));
+        Field[][] newBoard = new Field[][]
+        /*
+        00000000
+        01100000
+        01110000
+        00110000
+        00000000
+        00000000
+        00000000
+        00000000
+        */
+        {
+            {new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top)},
+            {new Field(0, ReplacementSource.Top), new Field(1, ReplacementSource.Top), new Field(1, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top)},
+            {new Field(0, ReplacementSource.Top), new Field(1, ReplacementSource.Top), new Field(1, ReplacementSource.Top), new Field(1, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top)},
+            {new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(1, ReplacementSource.Top), new Field(1, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top)},
+            {new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top)},
+            {new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top)},
+            {new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top)},
+            {new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top)}
+        };
+        test.set(newBoard);
+        List<Coord> list = test.FieldsToDestroy(new Coord(2, 2));
+        test.Print();
+        System.out.println();
+        test.DestroyFields(list);
         test.Print();
     }
 }
