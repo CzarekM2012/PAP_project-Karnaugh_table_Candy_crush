@@ -145,7 +145,7 @@ public class App extends Application {
     }
 
     void highlightTile(int x, int y) {
-        System.out.println("Highlighing " + x + ", " + y);
+        //System.out.println("Highlighing " + x + ", " + y);
         highlightedTiles.add(new Coord(x, y));
 
         Rectangle tile = getRectangleAt(x, y);
@@ -197,7 +197,8 @@ public class App extends Application {
         if(lastSelectedTile == null) {
             lastSelectedTile = new Coord(x, y);
             //highlightTile(x, y);
-            highlightNeighbours(x, y);
+            highlightTiles(karnaugh.FieldsToDestroy(new Coord(x, y)));
+            //highlightNeighbours(x, y);
             return;
         }
 
@@ -208,6 +209,7 @@ public class App extends Application {
 
     void trySwapTiles(Coord firstTile, Coord secondTile) {
         //highlightNeighbours(firstTile.x, firstTile.y);
+        
 
         removeHighlights();
     }

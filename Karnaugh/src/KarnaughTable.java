@@ -240,17 +240,17 @@ class KarnaughTable {
         return destinatitionList;
     }
 
-    public List<Coord> FieldsToDestroy(Coord moveCoord) {
+    public ArrayList<Coord> FieldsToDestroy(Coord moveCoord) {
         // returns list containing coords of every field to be destroyed together with
         // field at moveCoord
         int moveFieldValue = board[moveCoord.x][moveCoord.y].value;
-        List<Coord> fieldsToDestroy = new ArrayList<Coord>();
+        ArrayList<Coord> fieldsToDestroy = new ArrayList<Coord>();
         Coord greyMoveCoord = new Coord(indexToGrey[moveCoord.x], indexToGrey[moveCoord.y]);
-        List<ArrayList<Coord>> fieldsCollections = new ArrayList<ArrayList<Coord>>();
+        ArrayList<ArrayList<Coord>> fieldsCollections = new ArrayList<ArrayList<Coord>>();
 
-        List<Coord> collectionPotentialNewFields = new ArrayList<Coord>();
+        ArrayList<Coord> collectionPotentialNewFields = new ArrayList<Coord>();
         Coord greyDifference = new Coord();
-        List<Coord> adjacentsToMoveCoord = AdjacentFields(moveCoord);
+        ArrayList<Coord> adjacentsToMoveCoord = AdjacentFields(moveCoord);
         for (int i = 0; i < adjacentsToMoveCoord.size(); i++) {
             Coord neighour = adjacentsToMoveCoord.get(i);
             if (moveFieldValue == board[neighour.x][neighour.y].value) {
