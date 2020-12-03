@@ -3,6 +3,8 @@ import javafx.scene.control.Button;
 import java.util.HashMap;
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
@@ -15,10 +17,10 @@ import javafx.stage.Stage;
 
 
 public class App extends Application{
-    static final int WIDTH = 16;
-    static final int HEIGHT = 8;
-    static final int SQUARE_SIZE = 100;
-    static final int SCOREBAR_WIDTH = 150;
+    static int WIDTH = 8;
+    static int HEIGHT = 8;
+    static int SQUARE_SIZE = 100;
+    static int SCOREBAR_WIDTH = 150;
 
     private static Map<Integer, Color> colorDict = new HashMap<>(); // can be later used for coloring squares 
 
@@ -39,7 +41,7 @@ public class App extends Application{
     @Override
     public void start(Stage primaryStage){
 
-        primaryStage.setTitle("Title");
+        primaryStage.setTitle("Karnaugh");
 
         Pane gameLayout = new Pane();
         gameLayout.setPrefSize(WIDTH*SQUARE_SIZE, HEIGHT*SQUARE_SIZE);
@@ -48,14 +50,33 @@ public class App extends Application{
         VBox scorebarLayout = new VBox();
         scorebarLayout.setPrefSize(SCOREBAR_WIDTH, HEIGHT*SQUARE_SIZE);
 
-        Text scoreLabel = new Text("Score");
+        Button menuButton = new Button("Main menu");
+        menuButton.setFont(new Font("Arial", 15));
+        menuButton.setPrefWidth(0.8*SCOREBAR_WIDTH);
+        menuButton.setTextFill(Color.WHITE);
+        menuButton.setCursor(Cursor.HAND);
+        menuButton.setBackground(new Background(new BackgroundFill(Color.RED, new CornerRadii(0), Insets.EMPTY))); //makes the button red, could probably make it easier with css
+
+        menuButton.setOnMouseClicked(new EventHandler<MouseEvent>(){
+            @Override
+            public void handle(MouseEvent event){
+                System.out.println("Main menu button clicked.");
+                // currently unused, as there's no main menu yet
+            }
+        });
+
+
+        Text scoreLabel = new Text("Score:");
         scoreLabel.setFont(new Font("Arial", 35));
 
         Text score = new Text("00000000");
         score.setFont(new Font("Comic Sans", 24));
 
+   
+        scorebarLayout.setAlignment(Pos.BASELINE_CENTER);
+        scorebarLayout.getChildren().add(menuButton);
         scorebarLayout.getChildren().add(scoreLabel);
-        scorebarLayout.getChildren().add(score);    
+        scorebarLayout.getChildren().add(score);
 
         wholeLayout.getChildren().add(gameLayout);
         wholeLayout.getChildren().add(scorebarLayout);
@@ -80,13 +101,17 @@ public class App extends Application{
                         int xOfRctg = (int)(event.getSceneX())/SQUARE_SIZE; //x coordinate of the rectangle 
                         int yOfRctg = (int)(event.getSceneY())/SQUARE_SIZE; // y -|| -
                         // ^those tell you which rectangle was pressed, useful for implementing game mechanics
-                        rctg.setFill(Color.RED);
+
+                        score.setText(String.valueOf(Integer.parseInt(score.getText()) + 1)); //example of changing the score
+                        rctg.setFill(Color.RED); //example color change
                     }
                 });
             }
         }
 
-        getRectangleAt(1, 2).setFill(Color.BEIGE); //example use of getRectangleAt()
+        getRectangleAt(1, 1).setFill(Color.BEIGE); //example use of getRectangleAt()
+        getRectangleAt(WIDTH - 2, HEIGHT - 2).setFill(Color.BEIGE); //example use of getRectangleAt()
+        
         primaryStage.show();
     }
 
