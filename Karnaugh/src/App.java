@@ -1,27 +1,25 @@
 package Karnaugh.src;
 
+import java.util.ArrayList;
 import java.util.Map;
-
-import javax.swing.text.Highlighter.Highlight;
-
-import javafx.scene.control.Button;
 import java.util.HashMap;
+
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 
 public class App extends Application {
 
@@ -124,7 +122,15 @@ public class App extends Application {
                         // ^those tell you which rectangle was pressed, useful for implementing game
                         // mechanics
                         System.out.println("Clicked (" + xOfRctg + ", " + yOfRctg + ")");
-                        onTileSelected(xOfRctg, yOfRctg);
+                        Task<Void> task = new Task<Void>() {
+                            @Override
+                            protected Void call() throws Exception {
+                                onTileSelected(xOfRctg, yOfRctg);
+                                return null;
+                            }
+                        };
+                        
+                        new Thread(task).start();
                     }
                 });
             }
@@ -171,6 +177,26 @@ public class App extends Application {
         highlightedTiles.clear();
     }
 
+    void removeHighlightsDelay(int ms) {
+        Task<Void> rmHighlightDelay = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    Thread.sleep(ms);
+                } catch (InterruptedException e) {
+                }
+                return null;
+            }
+        };
+        rmHighlightDelay.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                removeHighlights();
+            }
+        });
+        new Thread(rmHighlightDelay).start();
+    }
+
     void updateTile(int x, int y) {
         Color color = colorDict.get(karnaugh.getTileValue(x, y));
         setTileColor(x, y, color);
@@ -193,25 +219,36 @@ public class App extends Application {
     }
 
     void onTileSelected(int x, int y) {
+
+        for(ArrayList<Coord> pattern : karnaugh.getPatternsContaining(new Coord(x, y), 2)) {
+            highlightTiles(pattern);
+            karnaugh.printTiles(pattern);
+            removeHighlightsDelay(500);
+            try {
+                Thread.sleep(600);
+            } catch(Exception e) {};
+        }
         
-        if(lastSelectedTile == null) {
+        /*if(lastSelectedTile == null) {
             lastSelectedTile = new Coord(x, y);
             //highlightTile(x, y);
-            highlightTiles(karnaugh.FieldsToDestroy(new Coord(x, y)));
-            //highlightNeighbours(x, y);
+            //highlightTiles(karnaugh.FieldsToDestroy(new Coord(x, y), 2));
+            highlightNeighbours(x, y);
             return;
         }
 
         //highlightTile(x, y);
         trySwapTiles(new Coord(lastSelectedTile), new Coord(x, y));
-        lastSelectedTile = null;
+        lastSelectedTile = null;*/
     }
 
     void trySwapTiles(Coord firstTile, Coord secondTile) {
-        //highlightNeighbours(firstTile.x, firstTile.y);
-        
-
         removeHighlights();
+        //ArrayList<Coord> tilesToDestroy = karnaugh.FieldsToDestroy(new Coord(firstTile.x, firstTile.y), 2);
+        //tilesToDestroy.addAll(karnaugh.FieldsToDestroy(new Coord(secondTile.x, secondTile.y), 2));
+        //highlightTiles(tilesToDestroy);
+        removeHighlightsDelay(500);
+        
     }
 
 }

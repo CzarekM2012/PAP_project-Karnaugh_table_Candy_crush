@@ -240,11 +240,11 @@ class KarnaughTable {
         return destinatitionList;
     }
 
-    public ArrayList<Coord> FieldsToDestroy(Coord moveCoord) {
-        // returns list containing coords of every field to be destroyed together with
-        // field at moveCoord
+    // Finds all tile patterns that contain selected tile, skips ones that are fully included in other patterns
+    // All patterns have to be at least 'minPatternTileCount' long to be considered
+    // TODO: Fix this so that it ALWAYS works
+    public ArrayList<ArrayList<Coord>> getPatternsContaining(Coord moveCoord, int minPatternTileCount) {
         int moveFieldValue = board[moveCoord.x][moveCoord.y].value;
-        ArrayList<Coord> fieldsToDestroy = new ArrayList<Coord>();
         Coord greyMoveCoord = new Coord(indexToGrey[moveCoord.x], indexToGrey[moveCoord.y]);
         ArrayList<ArrayList<Coord>> fieldsCollections = new ArrayList<ArrayList<Coord>>();
 
@@ -285,7 +285,19 @@ class KarnaughTable {
             }
         }
 
+        return fieldsCollections;
+    }
+
+    // Returns a list containing coords of every field to be destroyed together with given tile
+    // only includes a single instance of each tile
+    // TODO: add pattern lenght checking
+    public ArrayList<Coord> FieldsToDestroy(Coord tile, int minPatternTileCount) {
+
+        ArrayList<ArrayList<Coord>> fieldsCollections = getPatternsContaining(tile, minPatternTileCount);
+        ArrayList<Coord> fieldsToDestroy = new ArrayList<>();
+
         for (int i = 0; i < fieldsCollections.size(); i++) {
+            //printTiles(fieldsCollections.get(i));
             for (int j = 0; j < fieldsCollections.get(i).size(); j++) {
                 Coord inspected = fieldsCollections.get(i).get(j);
                 if (!fieldsToDestroy.contains(inspected)) {
@@ -294,6 +306,18 @@ class KarnaughTable {
             }
         }
         return fieldsToDestroy;
+    }
+
+    public void printTile(Coord tile) {
+        System.out.println("Tile: (" + tile.x + ", " + tile.y + "), value = " + board[tile.x][tile.y].value);
+    }
+
+    public static void printTiles(ArrayList<Coord> tiles) {
+        System.out.println("Tile list:");
+        for(Coord tile : tiles) {
+            System.out.print("(" + tile.x + ", " + tile.y + ")");
+        }
+        System.out.println();
     }
 
     public void Print() {
@@ -409,7 +433,7 @@ class KarnaughTable {
                         new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top),
                         new Field(0, ReplacementSource.Top), new Field(0, ReplacementSource.Top) } };
         test.set(newBoard);
-        List<Coord> list = test.FieldsToDestroy(new Coord(2, 2));
+        List<Coord> list = test.FieldsToDestroy(new Coord(2, 2), 2);
         test.Print();
         System.out.println();
         test.DestroyFields(list);
