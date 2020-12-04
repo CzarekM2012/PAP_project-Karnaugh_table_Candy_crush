@@ -34,7 +34,15 @@ class Coord {
         this.y = coord.y;
     }
 
-    public boolean equals(Coord coord) {
+    @Override
+    public boolean equals(Object object) {
+        if(super.equals(object))
+            return true;
+            
+        if(!(object instanceof Coord))
+            return false;
+        
+        Coord coord = (Coord)object;
         return (this.x == coord.x && this.y == coord.y);
     }
 }

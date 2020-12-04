@@ -26,14 +26,18 @@ public class App extends Application {
     // Karnaug table setup values
     static final int startTableSizeXBits = 3;
     static final int startTableSizeYBits = 3;
-    static final int startTableValueCount = 3;
+    static final int startTableValueCount = 5;
+
+    static final int MIN_PATTERN_SIZE = 4;
 
     static int WIDTH = 1 << startTableSizeXBits; // = 2^startTableSizeXBits
     static int HEIGHT = 1 << startTableSizeYBits;
     static int SQUARE_SIZE = 100;
     static int SCOREBAR_WIDTH = 150;
+    final static int ANIMATION_DELAY = 100;
 
     static Coord lastSelectedTile = null;
+    static boolean lockClicking = false;
 
     private static Map<Integer, Color> colorDict = new HashMap<>(); // can be later used for coloring squares
     KarnaughTable karnaugh; // Main karnaugh table, this is the core element of the game
@@ -41,10 +45,13 @@ public class App extends Application {
 
 
     public static void main(String[] args) {
-        colorDict.put(0, Color.GREEN);
-        colorDict.put(1, Color.BLUE);
-        colorDict.put(2, Color.YELLOW);
-        colorDict.put(3, Color.RED);
+        colorDict.put(0, Color.web("577590"));
+        colorDict.put(1, Color.web("90be6d"));
+        colorDict.put(2, Color.web("f8961e"));
+        colorDict.put(3, Color.web("f94144"));
+        colorDict.put(4, Color.web("48cae4"));
+        colorDict.put(5, Color.web("f9c74f"));
+        colorDict.put(6, Color.web("f3722c"));
         launch(args);
     }
 
@@ -117,6 +124,10 @@ public class App extends Application {
                 rctg.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
+                        if(lockClicking)
+                            return;
+                        lockClicking = true;
+                        
                         int xOfRctg = (int) (event.getSceneX()) / SQUARE_SIZE; // x coordinate of the rectangle
                         int yOfRctg = (int) (event.getSceneY()) / SQUARE_SIZE; // y -|| -
                         // ^those tell you which rectangle was pressed, useful for implementing game
@@ -220,35 +231,88 @@ public class App extends Application {
 
     void onTileSelected(int x, int y) {
 
-        for(ArrayList<Coord> pattern : karnaugh.getPatternsContaining(new Coord(x, y), 2)) {
-            highlightTiles(pattern);
-            karnaugh.printTiles(pattern);
-            removeHighlightsDelay(500);
-            try {
-                Thread.sleep(600);
-            } catch(Exception e) {};
-        }
+        // for(ArrayList<Coord> pattern : karnaugh.getPatternsContaining(new Coord(x, y), 2)) {
+        //     highlightTiles(pattern);
+        //     karnaugh.printTiles(pattern);
+        //     removeHighlightsDelay(500);
+        //     try {
+        //         Thread.sleep(600);
+        //     } catch(Exception e) {};
+        // }
         
-        /*if(lastSelectedTile == null) {
+
+
+
+        if(lastSelectedTile == null) {
             lastSelectedTile = new Coord(x, y);
             //highlightTile(x, y);
             //highlightTiles(karnaugh.FieldsToDestroy(new Coord(x, y), 2));
             highlightNeighbours(x, y);
+            lockClicking = false;
             return;
         }
 
         //highlightTile(x, y);
         trySwapTiles(new Coord(lastSelectedTile), new Coord(x, y));
-        lastSelectedTile = null;*/
+        lastSelectedTile = null;
     }
 
     void trySwapTiles(Coord firstTile, Coord secondTile) {
         removeHighlights();
-        //ArrayList<Coord> tilesToDestroy = karnaugh.FieldsToDestroy(new Coord(firstTile.x, firstTile.y), 2);
-        //tilesToDestroy.addAll(karnaugh.FieldsToDestroy(new Coord(secondTile.x, secondTile.y), 2));
-        //highlightTiles(tilesToDestroy);
-        removeHighlightsDelay(500);
-        
+
+        ArrayList<Coord> tilesToDestroy;
+        ArrayList<Coord> movedTiles = new ArrayList<Coord>();
+        movedTiles.add(new Coord(firstTile.x, firstTile.y));
+        movedTiles.add(new Coord(secondTile.x, secondTile.y));
+
+        karnaugh.swapTiles(firstTile, secondTile);
+        updateTable();
+        sleep(ANIMATION_DELAY);
+
+        // Destroy patterns until none remain
+        do {
+            // Seek
+            tilesToDestroy = new ArrayList<Coord>();
+            for(Coord tile : movedTiles) {
+                tilesToDestroy.addAll(karnaugh.FieldsToDestroy(tile, MIN_PATTERN_SIZE));
+                removeHighlights();
+                highlightTiles(tilesToDestroy);
+                sleep(ANIMATION_DELAY);
+            }
+            removeHighlights();
+
+            // Destroy
+            KarnaughTable.printTiles(tilesToDestroy);
+            karnaugh.DestroyFields(tilesToDestroy);
+            updateTable();
+            sleep(ANIMATION_DELAY);
+            
+            // Collapse
+            movedTiles = karnaugh.collapseGetTiles(1);
+            KarnaughTable.printTiles(movedTiles);
+            updateTable();
+            sleep(ANIMATION_DELAY);
+
+            highlightTiles(movedTiles);
+            sleep(ANIMATION_DELAY);
+            removeHighlights();
+
+            // Refill
+            karnaugh.FillWithRandoms();
+            updateTable();
+            sleep(ANIMATION_DELAY);
+            removeHighlights();
+
+        } while(!tilesToDestroy.isEmpty());
+
+        lockClicking = false;
+
+    }
+
+    void sleep(int timeMs) {
+        try {
+            Thread.sleep(timeMs);
+        } catch(Exception e) {};
     }
 
 }

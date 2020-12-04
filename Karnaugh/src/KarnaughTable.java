@@ -84,7 +84,7 @@ class KarnaughTable {
         }
     }
 
-    private void FillWithRandoms() {
+    public void FillWithRandoms() {
         Random generator = new Random();
         int size = replacementSourcesSet.size();
         ReplacementSource array[] = new ReplacementSource[size];
@@ -99,9 +99,22 @@ class KarnaughTable {
         }
     }
 
-    public Coord[][] Collapse(ReplacementSource replacementSource)
-    // moves fields in the direction opposite to the direction indicated by the
-    // replacementSource
+    // Runs Collapse() and transforms result into an Array of tiles which position changed during collapse
+    public ArrayList<Coord> collapseGetTiles(int direction) {
+        ArrayList<Coord> movedTiles = new ArrayList<Coord>();
+        Coord[][] result = Collapse(direction);
+
+        for(int x = 0; x < xSize; ++x)
+            for(int y = 0; y < ySize; ++y)
+                if(!result[x][y].equals(new Coord()))
+                    movedTiles.add(new Coord(result[x][y]));
+
+        return movedTiles;
+    }
+
+    public Coord[][] Collapse(int direction)
+    // TODO: I've changed it, so it no longer relies on a class with a private constructor, check if still correct
+    // moves fields in the opposite of specified direction
     // (if replacementSource equals ReplacementSource.Top, fields will be moving
     // down, etc.), if there are empty fields in that direction
     {
@@ -113,7 +126,7 @@ class KarnaughTable {
         }
         Coord currentPosition, collapser = new Coord(), move, nextLine, fall;
         Field clearField = new Field();
-        switch (replacementSource.id) {
+        switch (direction) {
             case 1:// Spawn at top -> collapse down
                 currentPosition = new Coord(0, ySize - 2);
                 move = new Coord(1, 0);
@@ -144,7 +157,7 @@ class KarnaughTable {
             collapser.set(currentPosition.x + fall.x, currentPosition.y + fall.y);
             if (!board[currentPosition.x][currentPosition.y].equals(clearField)
                     && board[collapser.x][collapser.y].equals(clearField)) {
-                while (collapser.x > 0 && collapser.x < xSize - 1 && collapser.y > 0 && collapser.y < ySize - 1
+                while (collapser.x >= 0 && collapser.x <= xSize - 1 && collapser.y > 0 && collapser.y < ySize - 1 //TODO: Fix this -> each fall direction only needs a sharp (> not >=) check on the "bottom"
                         && board[collapser.x + fall.x][collapser.y + fall.y].equals(clearField)) {
                     collapser.addTo(fall);
                 }
@@ -191,7 +204,9 @@ class KarnaughTable {
         int replacementSourcesCounts[] = { 0, 0, 0, 0, 0 };
         for (int i = 0; i < list.size(); i++) {
             Coord destroyed = list.get(i);
-            replacementSourcesCounts[board[destroyed.x][destroyed.y].replacementSource.id]++;
+            //System.out.print(board[destroyed.x][destroyed.y].replacementSource.id);
+            if(board[destroyed.x][destroyed.y].replacementSource.id != -1) // Added a safeguard
+                replacementSourcesCounts[board[destroyed.x][destroyed.y].replacementSource.id]++;
             board[destroyed.x][destroyed.y].clear();
         }
         int max = 0, index = 0;
@@ -297,7 +312,11 @@ class KarnaughTable {
         ArrayList<Coord> fieldsToDestroy = new ArrayList<>();
 
         for (int i = 0; i < fieldsCollections.size(); i++) {
-            //printTiles(fieldsCollections.get(i));
+            
+            // Take only patterns that have at least 'minPatternTileCount' tiles
+            if(fieldsCollections.get(i).size() < minPatternTileCount)
+                continue;
+            
             for (int j = 0; j < fieldsCollections.get(i).size(); j++) {
                 Coord inspected = fieldsCollections.get(i).get(j);
                 if (!fieldsToDestroy.contains(inspected)) {
@@ -368,6 +387,11 @@ class KarnaughTable {
         return copy;
     }
 
+    public void swapTiles(Coord t1, Coord t2) {
+        Field tmp = board[t1.x][t1.y];
+        board[t1.x][t1.y] = board[t2.x][t2.y];
+        board[t2.x][t2.y] = tmp;
+    }
 
     // Added some getters
     int getSizeX() {return xSize;}
@@ -391,7 +415,7 @@ class KarnaughTable {
         ReplacementSource spawnDirection = test.DestroyFields(Arrays.asList(array));
         test.Print();
         System.out.println();
-        test.Collapse(spawnDirection);
+        test.Collapse(spawnDirection.id);
         test.Print();
         System.out.println();
         test.FillWithRandoms();
