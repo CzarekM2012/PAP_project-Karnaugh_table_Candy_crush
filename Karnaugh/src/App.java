@@ -33,8 +33,10 @@ public class App extends Application {
     static int WIDTH = 1 << startTableSizeXBits; // = 2^startTableSizeXBits
     static int HEIGHT = 1 << startTableSizeYBits;
     static int SQUARE_SIZE = 100;
+    static int MIRROR_SIZE = 5;
+    static int MIRROR_FREQUENCY = 4; // mirrors appear every 4 squares, but I've put it as a variable in case I'm wrong
     static int SCOREBAR_WIDTH = 150;
-    final static int ANIMATION_DELAY = 300;
+    final static int ANIMATION_DELAY = 100;
 
     static Coord lastSelectedTile = null;
     static boolean lockClicking = false;
@@ -71,12 +73,13 @@ public class App extends Application {
         primaryStage.setTitle("Karnaugh");
 
         Pane gameLayout = new Pane();
-        gameLayout.setPrefSize(WIDTH * SQUARE_SIZE, HEIGHT * SQUARE_SIZE);
-        HBox wholeLayout = new HBox();
-        wholeLayout.setPrefSize(WIDTH * SQUARE_SIZE + SCOREBAR_WIDTH, HEIGHT * SQUARE_SIZE);
+        gameLayout.setPrefSize(WIDTH * SQUARE_SIZE + (WIDTH/MIRROR_FREQUENCY - 1)* MIRROR_SIZE, HEIGHT * SQUARE_SIZE + (HEIGHT/MIRROR_FREQUENCY - 1)*MIRROR_SIZE);
+
         VBox scorebarLayout = new VBox();
         scorebarLayout.setPrefSize(SCOREBAR_WIDTH, HEIGHT * SQUARE_SIZE);
 
+        HBox wholeLayout = new HBox();
+        wholeLayout.setPrefSize(gameLayout.getPrefWidth() + scorebarLayout.getPrefWidth(), Math.max(gameLayout.getPrefHeight(), scorebarLayout.getPrefHeight()));
         
         // Creating layout elements
         Button menuButton = new Button("Main menu");
@@ -120,8 +123,8 @@ public class App extends Application {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 Rectangle rctg = new Rectangle(SQUARE_SIZE, SQUARE_SIZE, Color.GREEN);
-                rctg.setTranslateX(SQUARE_SIZE * x);
-                rctg.setTranslateY(SQUARE_SIZE * y);
+                rctg.setTranslateX(SQUARE_SIZE * x + x/MIRROR_FREQUENCY * MIRROR_SIZE);
+                rctg.setTranslateY(SQUARE_SIZE * y + y/MIRROR_FREQUENCY * MIRROR_SIZE);
                 rctg.setCursor(Cursor.HAND);
                 rctg.setStroke(Color.BLACK);
 
