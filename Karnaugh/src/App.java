@@ -273,7 +273,7 @@ public class App extends Application {
         int yDiff = Math.abs(firstTile.y - secondTile.y);
         
         //Makes sure you can only move horizontally or vertically one space
-        if(xDiff + yDiff > 1){
+        if(xDiff + yDiff != 1){
             lockClicking = false;
             return;
         }
