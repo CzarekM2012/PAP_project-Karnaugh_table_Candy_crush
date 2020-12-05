@@ -23,7 +23,7 @@ import javafx.stage.Stage;
 
 public class App extends Application {
 
-    // Karnaug table setup values
+    // Karnaugh table setup values
     static final int startTableSizeXBits = 3;
     static final int startTableSizeYBits = 3;
     static final int startTableValueCount = 3;
