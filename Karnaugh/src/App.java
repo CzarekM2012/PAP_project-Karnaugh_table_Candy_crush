@@ -26,7 +26,7 @@ public class App extends Application {
     // Karnaug table setup values
     static final int startTableSizeXBits = 3;
     static final int startTableSizeYBits = 3;
-    static final int startTableValueCount = 5;
+    static final int startTableValueCount = 3;
 
     static final int MIN_PATTERN_SIZE = 4;
 
@@ -34,7 +34,7 @@ public class App extends Application {
     static int HEIGHT = 1 << startTableSizeYBits;
     static int SQUARE_SIZE = 100;
     static int SCOREBAR_WIDTH = 150;
-    final static int ANIMATION_DELAY = 100;
+    final static int ANIMATION_DELAY = 300;
 
     static Coord lastSelectedTile = null;
     static boolean lockClicking = false;
@@ -43,6 +43,8 @@ public class App extends Application {
     KarnaughTable karnaugh; // Main karnaugh table, this is the core element of the game
     ArrayList<Coord> highlightedTiles = new ArrayList<>();
 
+    Text scoreTextField;
+    int score = 0;
 
     public static void main(String[] args) {
         colorDict.put(0, Color.web("577590"));
@@ -96,13 +98,14 @@ public class App extends Application {
         Text scoreLabel = new Text("Score:");
         scoreLabel.setFont(new Font("Arial", 35));
 
-        Text score = new Text("00000000");
-        score.setFont(new Font("Comic Sans", 24));
+        scoreTextField = new Text("");
+        scoreTextField.setFont(new Font("Comic Sans", 24));
+        updateScore();
 
         scorebarLayout.setAlignment(Pos.BASELINE_CENTER);
         scorebarLayout.getChildren().add(menuButton);
         scorebarLayout.getChildren().add(scoreLabel);
-        scorebarLayout.getChildren().add(score);
+        scorebarLayout.getChildren().add(scoreTextField);
 
         wholeLayout.getChildren().add(gameLayout);
         wholeLayout.getChildren().add(scorebarLayout);
@@ -167,7 +170,6 @@ public class App extends Application {
 
         Rectangle tile = getRectangleAt(x, y);
         Color color = (Color)tile.getFill();
-        color = color.desaturate();
         color = color.desaturate();
         color = color.desaturate();
         tile.setFill(color);
@@ -274,22 +276,32 @@ public class App extends Application {
             // Seek
             tilesToDestroy = new ArrayList<Coord>();
             for(Coord tile : movedTiles) {
-                tilesToDestroy.addAll(karnaugh.FieldsToDestroy(tile, MIN_PATTERN_SIZE));
-                removeHighlights();
-                highlightTiles(tilesToDestroy);
-                sleep(ANIMATION_DELAY);
+                int lastSize = tilesToDestroy.size();
+                
+                ArrayList<Coord> toAdd = karnaugh.FieldsToDestroy(tile, MIN_PATTERN_SIZE);
+                toAdd.removeAll(tilesToDestroy); // Removing duplicates
+                tilesToDestroy.addAll(toAdd);
+
+                // Only show updates if something actually changed
+                if(lastSize != tilesToDestroy.size()) {
+                    removeHighlights();
+                    //KarnaughTable.printTiles(tilesToDestroy);
+                    highlightTiles(tilesToDestroy);
+                    sleep(ANIMATION_DELAY);
+                }
             }
+            addScore(tilesToDestroy.size());
             removeHighlights();
 
             // Destroy
-            KarnaughTable.printTiles(tilesToDestroy);
+            //KarnaughTable.printTiles(tilesToDestroy);
             karnaugh.DestroyFields(tilesToDestroy);
             updateTable();
             sleep(ANIMATION_DELAY);
             
             // Collapse
             movedTiles = karnaugh.collapseGetTiles(1);
-            KarnaughTable.printTiles(movedTiles);
+            //KarnaughTable.printTiles(movedTiles);
             updateTable();
             sleep(ANIMATION_DELAY);
 
@@ -307,6 +319,15 @@ public class App extends Application {
 
         lockClicking = false;
 
+    }
+
+    void addScore(int value) {
+        score += value;
+        updateScore();
+    }
+
+    void updateScore() {
+        scoreTextField.setText(Integer.toString(score));
     }
 
     void sleep(int timeMs) {
