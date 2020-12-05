@@ -26,7 +26,7 @@ public class App extends Application {
     // Karnaugh table setup values
     static final int startTableSizeXBits = 3;
     static final int startTableSizeYBits = 3;
-    static final int startTableValueCount = 3;
+    static final int startTableValueCount = 5;
 
     static final int MIN_PATTERN_SIZE = 4;
 
@@ -268,6 +268,16 @@ public class App extends Application {
 
     void trySwapTiles(Coord firstTile, Coord secondTile) {
         removeHighlights();
+
+        int xDiff = Math.abs(firstTile.x - secondTile.x);
+        int yDiff = Math.abs(firstTile.y - secondTile.y);
+        
+        //Makes sure you can only move horizontally or vertically one space
+        if(xDiff + yDiff > 1){
+            lockClicking = false;
+            return;
+        }
+
 
         ArrayList<Coord> tilesToDestroy;
         ArrayList<Coord> movedTiles = new ArrayList<Coord>();
