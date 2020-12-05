@@ -268,12 +268,9 @@ public class App extends Application {
 
     void trySwapTiles(Coord firstTile, Coord secondTile) {
         removeHighlights();
-
-        int xDiff = Math.abs(firstTile.x - secondTile.x);
-        int yDiff = Math.abs(firstTile.y - secondTile.y);
         
         //Makes sure you can only move horizontally or vertically one space
-        if(xDiff + yDiff != 1){
+        if(!karnaugh.AdjacentFields(firstTile).contains(secondTile)){
             lockClicking = false;
             return;
         }
@@ -284,10 +281,10 @@ public class App extends Application {
         movedTiles.add(new Coord(firstTile.x, firstTile.y));
         movedTiles.add(new Coord(secondTile.x, secondTile.y));
 
-        karnaugh.swapTiles(firstTile, secondTile);
-        updateTable();
-        sleep(ANIMATION_DELAY);
+        // we have to make sure the move is "1 bit away" and that after the move, DESTRUCTION occurs
 
+        karnaugh.swapTiles(firstTile, secondTile); // firstly: we swap the tiles in the table's logical model but don't update the gui yet
+       
         // Destroy patterns until none remain
         do {
             // Seek
@@ -307,6 +304,17 @@ public class App extends Application {
                     sleep(ANIMATION_DELAY);
                 }
             }
+
+            // then we check whether, after the swap that occured in the logical model, there are any DESTRUCTION possibilities
+            if(tilesToDestroy.size() == 0){
+                // if not - we reverse the swap as if nothing happened
+                karnaugh.swapTiles(firstTile, secondTile);
+                sleep(ANIMATION_DELAY);
+            }
+
+            // else we acknowledge the swap in the logical model, update the gui and go on to DESTROY
+            updateTable();
+
             addScore(tilesToDestroy.size());
             removeHighlights();
 
