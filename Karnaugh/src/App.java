@@ -113,6 +113,10 @@ public class App extends Application {
 
         primaryStage.setScene(scene);
 
+
+        /****************************************************
+                FILLING THE LAYOUT WITH SQUARES
+        ****************************************************/
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 Rectangle rctg = new Rectangle(SQUARE_SIZE, SQUARE_SIZE, Color.GREEN);
