@@ -16,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -39,9 +40,9 @@ public class App extends Application {
     static int MIRROR_SIZE = 5;
     static int MIRROR_FREQUENCY = 4; // mirrors appear every 4 squares, but I've put it as a variable in case I'm wrong
     static int SCOREBAR_WIDTH = 150;
-    static int BASE_X_OFFSET = 50;
-    static int BASE_Y_OFFSET = 50;
-    static int BOTTOM_PAD = 50;
+    static int BASE_X_OFFSET = 75;
+    static int BASE_Y_OFFSET = 75;
+    static int BOTTOM_PAD = 75;
     final static int ANIMATION_DELAY = 50;
 
     static Coord lastSelectedTile = null;
@@ -169,15 +170,42 @@ public class App extends Application {
         /***************************************************
         *       ADDING ROW/COLUMN LABELS 
         ***************************************************/
-        //horizontal
+        // column labels
         for(int x = 0; x < WIDTH; x++){
             TextField txt = new TextField((String.format("%" + startTableSizeXBits + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(x)))).replace(" ", "0"));
             txt.setEditable(false);
-            txt.setMaxWidth(SQUARE_SIZE);
+            
+            txt.setPrefSize(SQUARE_SIZE/2, BASE_Y_OFFSET - 1);
+
+            //txt.setMaxWidth(SQUARE_SIZE);
+            //txt.setMaxHeight(BASE_X_OFFSET);
+
             txt.setFont(new Font("Arial", 15));
             txt.setAlignment(Pos.CENTER);
 
-            txt.setTranslateX(BASE_X_OFFSET + x*SQUARE_SIZE + x/MIRROR_FREQUENCY * MIRROR_SIZE);
+            txt.setTranslateX(BASE_X_OFFSET + x*SQUARE_SIZE + x/MIRROR_FREQUENCY * MIRROR_SIZE + SQUARE_SIZE/4);
+
+            gameLayout.getChildren().add(txt);
+        }
+
+        // row labels
+        for(int y = 0; y < WIDTH; y++){
+            
+            String str = (String.format("%" + startTableSizeYBits + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(y)))).replace(" ", "0");
+            //String newStr = str.replaceAll("(.{1})", "$1\n"); //puts a newline every character
+
+            TextField txt = new TextField(str);
+            txt.setEditable(false);
+
+            txt.setPrefSize(BASE_X_OFFSET - 1, SQUARE_SIZE/2);
+            
+            //txt.setMaxWidth(BASE_Y_OFFSET - 1);
+            //txt.setMaxHeight(SQUARE_SIZE);
+
+            txt.setFont(new Font("Arial", 15));
+            txt.setAlignment(Pos.CENTER);
+
+            txt.setTranslateY(BASE_Y_OFFSET + y*SQUARE_SIZE + y/MIRROR_FREQUENCY * MIRROR_SIZE + SQUARE_SIZE/4);
 
             gameLayout.getChildren().add(txt);
         }
