@@ -171,7 +171,7 @@ public class App extends Application {
         ***************************************************/
         //horizontal
         for(int x = 0; x < WIDTH; x++){
-            TextField txt = new TextField(Integer.toBinaryString(karnaugh.translateIndexToGrey(x)));
+            TextField txt = new TextField((String.format("%" + startTableSizeXBits + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(x)))).replace(" ", "0"));
             txt.setEditable(false);
             txt.setMaxWidth(SQUARE_SIZE);
             txt.setFont(new Font("Arial", 15));
