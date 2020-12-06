@@ -463,4 +463,9 @@ class KarnaughTable {
         test.DestroyFields(list);
         test.Print();
     }
+
+
+    public int translateIndexToGrey(int index){
+        return indexToGrey[index];
+    }
 }

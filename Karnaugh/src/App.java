@@ -2,6 +2,7 @@ package Karnaugh.src;
 
 import java.util.ArrayList;
 import java.util.Map;
+
 import java.util.HashMap;
 
 import javafx.application.Application;
@@ -14,11 +15,13 @@ import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -72,6 +75,9 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) {
 
+        // Initialising mechanics
+        karnaugh = new KarnaughTable(startTableSizeXBits, startTableSizeYBits, startTableValueCount);
+
         // Preparing window
         primaryStage.setTitle("Karnaugh");
 
@@ -121,7 +127,7 @@ public class App extends Application {
 
 
         /****************************************************
-                FILLING THE LAYOUT WITH SQUARES
+        *       FILLING THE LAYOUT WITH SQUARES
         ****************************************************/
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
@@ -141,8 +147,8 @@ public class App extends Application {
                             return;
                         lockClicking = true;
                         
-                        int xOfRctg = (int) (event.getSceneX()) / SQUARE_SIZE; // x coordinate of the rectangle
-                        int yOfRctg = (int) (event.getSceneY()) / SQUARE_SIZE; // y -|| -
+                        int xOfRctg = (int) ((event.getSceneX() - BASE_X_OFFSET)  / SQUARE_SIZE); // x coordinate of the rectangle
+                        int yOfRctg = (int) ((event.getSceneY() - BASE_Y_OFFSET)  / SQUARE_SIZE); // y -|| -
                         // ^those tell you which rectangle was pressed, useful for implementing game
                         // mechanics
                         System.out.println("Clicked (" + xOfRctg + ", " + yOfRctg + ")");
@@ -160,15 +166,27 @@ public class App extends Application {
             }
         }
 
-        //getRectangleAt(1, 1).setFill(Color.BEIGE); // example use of getRectangleAt()
-        //getRectangleAt(WIDTH - 2, HEIGHT - 2).setFill(Color.BEIGE); // example use of getRectangleAt()
+        /***************************************************
+        *       ADDING ROW/COLUMN LABELS 
+        ***************************************************/
+        //horizontal
+        for(int x = 0; x < WIDTH; x++){
+            TextField txt = new TextField(Integer.toBinaryString(karnaugh.translateIndexToGrey(x)));
+            txt.setEditable(false);
+            txt.setMaxWidth(SQUARE_SIZE);
+            txt.setFont(new Font("Arial", 15));
+            txt.setAlignment(Pos.CENTER);
 
-        // Initialising mechanics
-        karnaugh = new KarnaughTable(startTableSizeXBits, startTableSizeYBits, startTableValueCount);
+            txt.setTranslateX(BASE_X_OFFSET + x*SQUARE_SIZE + x/MIRROR_FREQUENCY * MIRROR_SIZE);
+
+            gameLayout.getChildren().add(txt);
+        }
+
+
         updateTable();
-
         primaryStage.show();
     }
+
 
     void setTileColor(int x, int y, Color color) {
         getRectangleAt(x, y).setFill(color);
