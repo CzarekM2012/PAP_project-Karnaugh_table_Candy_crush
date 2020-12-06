@@ -26,7 +26,7 @@ public class App extends Application {
     // Karnaugh table setup values
     static final int startTableSizeXBits = 3;
     static final int startTableSizeYBits = 3;
-    static final int startTableValueCount = 5;
+    static final int startTableValueCount = 4;
 
     static final int MIN_PATTERN_SIZE = 4;
 
@@ -36,7 +36,7 @@ public class App extends Application {
     static int MIRROR_SIZE = 5;
     static int MIRROR_FREQUENCY = 4; // mirrors appear every 4 squares, but I've put it as a variable in case I'm wrong
     static int SCOREBAR_WIDTH = 150;
-    final static int ANIMATION_DELAY = 100;
+    final static int ANIMATION_DELAY = 50;
 
     static Coord lastSelectedTile = null;
     static boolean lockClicking = false;
@@ -266,22 +266,22 @@ public class App extends Application {
         lastSelectedTile = null;
     }
 
+    static boolean firstIteration = true;
     void trySwapTiles(Coord firstTile, Coord secondTile) {
         removeHighlights();
         
-        //Makes sure you can only move horizontally or vertically one space
+        //Makes sure you can only move to the positions "1 bit away"
         if(!karnaugh.AdjacentFields(firstTile).contains(secondTile)){
             lockClicking = false;
             return;
         }
-
 
         ArrayList<Coord> tilesToDestroy;
         ArrayList<Coord> movedTiles = new ArrayList<Coord>();
         movedTiles.add(new Coord(firstTile.x, firstTile.y));
         movedTiles.add(new Coord(secondTile.x, secondTile.y));
 
-        // we have to make sure the move is "1 bit away" and that after the move, DESTRUCTION occurs
+        // we have to make sure that after the move, DESTRUCTION occurs
 
         karnaugh.swapTiles(firstTile, secondTile); // firstly: we swap the tiles in the table's logical model but don't update the gui yet
        
@@ -306,7 +306,7 @@ public class App extends Application {
             }
 
             // then we check whether, after the swap that occured in the logical model, there are any DESTRUCTION possibilities
-            if(tilesToDestroy.size() == 0){
+            if(tilesToDestroy.size() == 0 && firstIteration){
                 // if not - we reverse the swap as if nothing happened
                 karnaugh.swapTiles(firstTile, secondTile);
                 sleep(ANIMATION_DELAY);
@@ -340,8 +340,10 @@ public class App extends Application {
             sleep(ANIMATION_DELAY);
             removeHighlights();
 
+            firstIteration = false;
         } while(!tilesToDestroy.isEmpty());
 
+        firstIteration = true;
         lockClicking = false;
 
     }
