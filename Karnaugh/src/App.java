@@ -36,6 +36,9 @@ public class App extends Application {
     static int MIRROR_SIZE = 5;
     static int MIRROR_FREQUENCY = 4; // mirrors appear every 4 squares, but I've put it as a variable in case I'm wrong
     static int SCOREBAR_WIDTH = 150;
+    static int BASE_X_OFFSET = 50;
+    static int BASE_Y_OFFSET = 50;
+    static int BOTTOM_PAD = 50;
     final static int ANIMATION_DELAY = 50;
 
     static Coord lastSelectedTile = null;
@@ -73,7 +76,7 @@ public class App extends Application {
         primaryStage.setTitle("Karnaugh");
 
         Pane gameLayout = new Pane();
-        gameLayout.setPrefSize(WIDTH * SQUARE_SIZE + (WIDTH/MIRROR_FREQUENCY - 1)* MIRROR_SIZE, HEIGHT * SQUARE_SIZE + (HEIGHT/MIRROR_FREQUENCY - 1)*MIRROR_SIZE);
+        gameLayout.setPrefSize(BASE_X_OFFSET + WIDTH * SQUARE_SIZE + (WIDTH/MIRROR_FREQUENCY - 1)* MIRROR_SIZE, BASE_Y_OFFSET + HEIGHT * SQUARE_SIZE + (HEIGHT/MIRROR_FREQUENCY - 1)*MIRROR_SIZE + BOTTOM_PAD);
 
         VBox scorebarLayout = new VBox();
         scorebarLayout.setPrefSize(SCOREBAR_WIDTH, HEIGHT * SQUARE_SIZE);
@@ -123,8 +126,8 @@ public class App extends Application {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 Rectangle rctg = new Rectangle(SQUARE_SIZE, SQUARE_SIZE, Color.GREEN);
-                rctg.setTranslateX(SQUARE_SIZE * x + x/MIRROR_FREQUENCY * MIRROR_SIZE);
-                rctg.setTranslateY(SQUARE_SIZE * y + y/MIRROR_FREQUENCY * MIRROR_SIZE);
+                rctg.setTranslateX(BASE_X_OFFSET + SQUARE_SIZE * x + x/MIRROR_FREQUENCY * MIRROR_SIZE);
+                rctg.setTranslateY(BASE_Y_OFFSET + SQUARE_SIZE * y + y/MIRROR_FREQUENCY * MIRROR_SIZE);
                 rctg.setCursor(Cursor.HAND);
                 rctg.setStroke(Color.BLACK);
 
