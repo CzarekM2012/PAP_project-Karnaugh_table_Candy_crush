@@ -16,13 +16,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.*;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -175,37 +173,27 @@ public class App extends Application {
             TextField txt = new TextField((String.format("%" + startTableSizeXBits + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(x)))).replace(" ", "0"));
             txt.setEditable(false);
             
-            txt.setPrefSize(SQUARE_SIZE/2, BASE_Y_OFFSET - 1);
-
-            //txt.setMaxWidth(SQUARE_SIZE);
-            //txt.setMaxHeight(BASE_X_OFFSET);
+            txt.setPrefSize(SQUARE_SIZE, BASE_Y_OFFSET - 1);
 
             txt.setFont(new Font("Arial", 15));
             txt.setAlignment(Pos.CENTER);
 
-            txt.setTranslateX(BASE_X_OFFSET + x*SQUARE_SIZE + x/MIRROR_FREQUENCY * MIRROR_SIZE + SQUARE_SIZE/4);
+            txt.setTranslateX(BASE_X_OFFSET + x*SQUARE_SIZE + x/MIRROR_FREQUENCY * MIRROR_SIZE);
 
             gameLayout.getChildren().add(txt);
         }
 
         // row labels
         for(int y = 0; y < WIDTH; y++){
-            
-            String str = (String.format("%" + startTableSizeYBits + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(y)))).replace(" ", "0");
-            //String newStr = str.replaceAll("(.{1})", "$1\n"); //puts a newline every character
-
-            TextField txt = new TextField(str);
+            TextField txt = new TextField((String.format("%" + startTableSizeYBits + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(y)))).replace(" ", "0"));
             txt.setEditable(false);
 
-            txt.setPrefSize(BASE_X_OFFSET - 1, SQUARE_SIZE/2);
+            txt.setPrefSize(BASE_X_OFFSET - 1, SQUARE_SIZE);
             
-            //txt.setMaxWidth(BASE_Y_OFFSET - 1);
-            //txt.setMaxHeight(SQUARE_SIZE);
-
             txt.setFont(new Font("Arial", 15));
             txt.setAlignment(Pos.CENTER);
 
-            txt.setTranslateY(BASE_Y_OFFSET + y*SQUARE_SIZE + y/MIRROR_FREQUENCY * MIRROR_SIZE + SQUARE_SIZE/4);
+            txt.setTranslateY(BASE_Y_OFFSET + y*SQUARE_SIZE + y/MIRROR_FREQUENCY * MIRROR_SIZE);
 
             gameLayout.getChildren().add(txt);
         }
