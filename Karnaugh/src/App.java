@@ -26,14 +26,14 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     // Karnaugh table setup values
-    static final int startTableSizeXBits = 3;
-    static final int startTableSizeYBits = 3;
-    static final int startTableValueCount = 4;
+    static final int START_TABLE_SIZE_X_BITS = 3; // How to split bits between x and y axis in table
+    static final int START_TABLE_SIZE_Y_BITS = 3;
+    static final int START_TABLE_VALUE_COUNT = 4; // How many logic values (tile colors) should be there
+    static final int MIN_PATTERN_SIZE = 4; // Pattern has to be at least this size to be scored
 
-    static final int MIN_PATTERN_SIZE = 4;
-
-    static int WIDTH = 1 << startTableSizeXBits; // = 2^startTableSizeXBits
-    static int HEIGHT = 1 << startTableSizeYBits;
+    // Default UI element sizes and offsets
+    static int WIDTH = 1 << START_TABLE_SIZE_X_BITS; // = 2^startTableSizeXBits
+    static int HEIGHT = 1 << START_TABLE_SIZE_Y_BITS;
     static int SQUARE_SIZE = 100;
     static int MIRROR_SIZE = 5;
     static int MIRROR_FREQUENCY = 4; // mirrors appear every 4 squares, but I've put it as a variable in case I'm wrong
@@ -43,13 +43,16 @@ public class App extends Application {
     static int BOTTOM_PAD = 75;
     final static int ANIMATION_DELAY = 50;
 
+    // Input handling
     static Coord lastSelectedTile = null;
     static boolean lockClicking = false;
 
-    private static Map<Integer, Color> colorDict = new HashMap<>(); // can be later used for coloring squares
-    KarnaughTable karnaugh; // Main karnaugh table, this is the core element of the game
+    // Main data structures
+    KarnaughTable karnaugh;                                             // Main karnaugh table, the core element of the game
+    private static Map<Integer, Color> colorDict = new HashMap<>();     // Tile value-to-color map
     ArrayList<Coord> highlightedTiles = new ArrayList<>();
 
+    // Score
     Text scoreTextField;
     int score = 0;
 
@@ -64,24 +67,24 @@ public class App extends Application {
         launch(args);
     }
 
+    // Table fields' graphical representation
     public Rectangle[] rectangles = new Rectangle[WIDTH * HEIGHT];
 
-    public Rectangle getRectangleAt(int xRctg, int yRctg) {
-        // returns a reference to a rectangle on the board
-        return rectangles[yRctg * WIDTH + xRctg];
-    }
+    // Returns a reference to a rectangle on the board
+    public Rectangle getRectangleAt(int xRctg, int yRctg) {return rectangles[yRctg * WIDTH + xRctg];}
 
     @Override
     public void start(Stage primaryStage) {
 
         // Initialising mechanics
-        karnaugh = new KarnaughTable(startTableSizeXBits, startTableSizeYBits, startTableValueCount);
+        karnaugh = new KarnaughTable(START_TABLE_SIZE_X_BITS, START_TABLE_SIZE_Y_BITS, START_TABLE_VALUE_COUNT, MIN_PATTERN_SIZE);
 
         // Preparing window
         primaryStage.setTitle("Karnaugh");
 
         Pane gameLayout = new Pane();
-        gameLayout.setPrefSize(BASE_X_OFFSET + WIDTH * SQUARE_SIZE + (WIDTH/MIRROR_FREQUENCY - 1)* MIRROR_SIZE, BASE_Y_OFFSET + HEIGHT * SQUARE_SIZE + (HEIGHT/MIRROR_FREQUENCY - 1)*MIRROR_SIZE + BOTTOM_PAD);
+        gameLayout.setPrefSize(BASE_X_OFFSET + WIDTH * SQUARE_SIZE + (WIDTH/MIRROR_FREQUENCY - 1)* MIRROR_SIZE,
+                               BASE_Y_OFFSET + HEIGHT * SQUARE_SIZE + (HEIGHT/MIRROR_FREQUENCY - 1)*MIRROR_SIZE + BOTTOM_PAD);
 
         VBox scorebarLayout = new VBox();
         scorebarLayout.setPrefSize(SCOREBAR_WIDTH, HEIGHT * SQUARE_SIZE);
@@ -95,8 +98,7 @@ public class App extends Application {
         menuButton.setPrefWidth(0.8 * SCOREBAR_WIDTH);
         menuButton.setTextFill(Color.WHITE);
         menuButton.setCursor(Cursor.HAND);
-        // makes the button red, could probably make it easier with css
-        menuButton.setBackground(new Background(new BackgroundFill(Color.RED, new CornerRadii(0), Insets.EMPTY))); 
+        menuButton.setBackground(new Background(new BackgroundFill(Color.RED, new CornerRadii(0), Insets.EMPTY))); // makes the button red, could probably make it easier with css 
 
         menuButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -125,9 +127,7 @@ public class App extends Application {
         primaryStage.setScene(scene);
 
 
-        /****************************************************
-        *       FILLING THE LAYOUT WITH SQUARES
-        ****************************************************/
+        // Filling the layout with squares
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 Rectangle rctg = new Rectangle(SQUARE_SIZE, SQUARE_SIZE, Color.GREEN);
@@ -139,6 +139,7 @@ public class App extends Application {
                 rectangles[y * WIDTH + x] = rctg;
                 gameLayout.getChildren().add(rctg);
 
+                // Rectangle input handling
                 rctg.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
@@ -146,11 +147,12 @@ public class App extends Application {
                             return;
                         lockClicking = true;
                         
+                        // These coords tell which rectangle was pressed
                         int xOfRctg = (int) ((event.getSceneX() - BASE_X_OFFSET)  / SQUARE_SIZE); // x coordinate of the rectangle
-                        int yOfRctg = (int) ((event.getSceneY() - BASE_Y_OFFSET)  / SQUARE_SIZE); // y -|| -
-                        // ^those tell you which rectangle was pressed, useful for implementing game
-                        // mechanics
-                        System.out.println("Clicked (" + xOfRctg + ", " + yOfRctg + ")");
+                        int yOfRctg = (int) ((event.getSceneY() - BASE_Y_OFFSET)  / SQUARE_SIZE); // y ...
+                        //System.out.println("Clicked (" + xOfRctg + ", " + yOfRctg + ")");
+
+                        // Game functions are started in a separate thread to keep the UI responsive
                         Task<Void> task = new Task<Void>() {
                             @Override
                             protected Void call() throws Exception {
@@ -165,12 +167,12 @@ public class App extends Application {
             }
         }
 
-        /***************************************************
-        *       ADDING ROW/COLUMN LABELS 
-        ***************************************************/
-        // column labels
+
+        // Adding row and column labels
+        
+        // Column labels
         for(int x = 0; x < WIDTH; x++){
-            TextField txt = new TextField((String.format("%" + startTableSizeXBits + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(x)))).replace(" ", "0"));
+            TextField txt = new TextField((String.format("%" + START_TABLE_SIZE_X_BITS + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(x)))).replace(" ", "0"));
             txt.setEditable(false);
             
             txt.setPrefSize(SQUARE_SIZE, BASE_Y_OFFSET - 1);
@@ -183,9 +185,9 @@ public class App extends Application {
             gameLayout.getChildren().add(txt);
         }
 
-        // row labels
+        // Row labels
         for(int y = 0; y < WIDTH; y++){
-            TextField txt = new TextField((String.format("%" + startTableSizeYBits + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(y)))).replace(" ", "0"));
+            TextField txt = new TextField((String.format("%" + START_TABLE_SIZE_Y_BITS + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(y)))).replace(" ", "0"));
             txt.setEditable(false);
 
             txt.setPrefSize(BASE_X_OFFSET - 1, SQUARE_SIZE);
@@ -208,6 +210,8 @@ public class App extends Application {
         getRectangleAt(x, y).setFill(color);
     }
 
+    // Highlights a tile by desaturating it. Highlighted tiles can be cleared using removeHighlights()
+    void highlightTile(Coord tile) {highlightTile(tile.x, tile.y);}
     void highlightTile(int x, int y) {
         //System.out.println("Highlighing " + x + ", " + y);
         highlightedTiles.add(new Coord(x, y));
@@ -225,7 +229,7 @@ public class App extends Application {
     }
 
     void highlightNeighbours(int x, int y) {
-        highlightTiles(karnaugh.AdjacentFields(new Coord(x, y)));
+        highlightTiles(karnaugh.adjacentFields(new Coord(x, y)));
     }
 
     void removeHighlights() {
@@ -234,81 +238,46 @@ public class App extends Application {
         highlightedTiles.clear();
     }
 
-    void removeHighlightsDelay(int ms) {
-        Task<Void> rmHighlightDelay = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                try {
-                    Thread.sleep(ms);
-                } catch (InterruptedException e) {
-                }
-                return null;
-            }
-        };
-        rmHighlightDelay.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                removeHighlights();
-            }
-        });
-        new Thread(rmHighlightDelay).start();
-    }
-
+    // Redraws a tile with given coordinates
+    void updateTile(Coord coord) {updateTile(coord.x, coord.y);}
     void updateTile(int x, int y) {
         Color color = colorDict.get(karnaugh.getTileValue(x, y));
         setTileColor(x, y, color);
     }
 
-    void updateTile(Coord coord) {
-        updateTile(coord.x, coord.y);
-    }
-
     void updateTiles(ArrayList<Coord> coords) {
-        for(Coord coord : coords) {
+        for(Coord coord : coords)
             updateTile(coord);
-        }
     }
 
+    // Redraws whole table
     void updateTable() {
         for(int x = 0; x < karnaugh.getSizeX(); ++x)
             for(int y = 0; y < karnaugh.getBitSizeY(); ++y)
                 updateTile(x, y);
     }
 
+    // Input processing function
+    // decides when to swap tiles
     void onTileSelected(int x, int y) {
-
-        // for(ArrayList<Coord> pattern : karnaugh.getPatternsContaining(new Coord(x, y), 2)) {
-        //     highlightTiles(pattern);
-        //     karnaugh.printTiles(pattern);
-        //     removeHighlightsDelay(500);
-        //     try {
-        //         Thread.sleep(600);
-        //     } catch(Exception e) {};
-        // }
-        
-
-
 
         if(lastSelectedTile == null) {
             lastSelectedTile = new Coord(x, y);
-            //highlightTile(x, y);
-            //highlightTiles(karnaugh.FieldsToDestroy(new Coord(x, y), 2));
             highlightNeighbours(x, y);
             lockClicking = false;
             return;
         }
 
-        //highlightTile(x, y);
         trySwapTiles(new Coord(lastSelectedTile), new Coord(x, y));
         lastSelectedTile = null;
     }
 
-    static boolean firstIteration = true;
+
     void trySwapTiles(Coord firstTile, Coord secondTile) {
         removeHighlights();
         
-        //Makes sure you can only move to the positions "1 bit away"
-        if(!karnaugh.AdjacentFields(firstTile).contains(secondTile)){
+        // Makes sure that tiles are swapped only "1 bit away"
+        if(!karnaugh.adjacentFields(firstTile).contains(secondTile)){
             lockClicking = false;
             return;
         }
@@ -322,6 +291,18 @@ public class App extends Application {
 
         karnaugh.swapTiles(firstTile, secondTile); // firstly: we swap the tiles in the table's logical model but don't update the gui yet
        
+
+        // Check whether, after the swap that occured in the logical model, there are any DESTRUCTION possibilities
+        if(karnaugh.fieldsToDestroy(firstTile, MIN_PATTERN_SIZE).size() == 0 && karnaugh.fieldsToDestroy(secondTile, MIN_PATTERN_SIZE).size() == 0){
+            // if not - reverse the swap as if nothing happened
+            karnaugh.swapTiles(firstTile, secondTile);
+            sleep(ANIMATION_DELAY);
+            lockClicking = false;
+            return;
+        }
+
+        // else acknowledge the swap in the logical model, update the gui and go on to DESTROY
+
         // Destroy patterns until none remain
         do {
             // Seek
@@ -329,7 +310,7 @@ public class App extends Application {
             for(Coord tile : movedTiles) {
                 int lastSize = tilesToDestroy.size();
                 
-                ArrayList<Coord> toAdd = karnaugh.FieldsToDestroy(tile, MIN_PATTERN_SIZE);
+                ArrayList<Coord> toAdd = karnaugh.fieldsToDestroy(tile, MIN_PATTERN_SIZE);
                 toAdd.removeAll(tilesToDestroy); // Removing duplicates
                 tilesToDestroy.addAll(toAdd);
 
@@ -342,14 +323,7 @@ public class App extends Application {
                 }
             }
 
-            // then we check whether, after the swap that occured in the logical model, there are any DESTRUCTION possibilities
-            if(tilesToDestroy.size() == 0 && firstIteration){
-                // if not - we reverse the swap as if nothing happened
-                karnaugh.swapTiles(firstTile, secondTile);
-                sleep(ANIMATION_DELAY);
-            }
-
-            // else we acknowledge the swap in the logical model, update the gui and go on to DESTROY
+            
             updateTable();
 
             addScore(tilesToDestroy.size());
@@ -357,7 +331,7 @@ public class App extends Application {
 
             // Destroy
             //KarnaughTable.printTiles(tilesToDestroy);
-            karnaugh.DestroyFields(tilesToDestroy);
+            karnaugh.destroyFields(tilesToDestroy);
             updateTable();
             sleep(ANIMATION_DELAY);
             
@@ -372,19 +346,18 @@ public class App extends Application {
             removeHighlights();
 
             // Refill
-            karnaugh.FillWithRandoms();
+            movedTiles.addAll(karnaugh.fillWithRandoms());
             updateTable();
             sleep(ANIMATION_DELAY);
             removeHighlights();
 
-            firstIteration = false;
         } while(!tilesToDestroy.isEmpty());
 
-        firstIteration = true;
         lockClicking = false;
 
     }
 
+    // Adds a value to score, more of a placeholder for now
     void addScore(int value) {
         score += value;
         updateScore();
@@ -394,6 +367,7 @@ public class App extends Application {
         scoreTextField.setText(Integer.toString(score));
     }
 
+    // Just a tiny function to make code cleaner
     void sleep(int timeMs) {
         try {
             Thread.sleep(timeMs);

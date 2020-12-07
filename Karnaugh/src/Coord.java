@@ -1,5 +1,6 @@
 package Karnaugh.src;
 
+// Yet another implementation of Point class
 class Coord {
     public int x, y;
 

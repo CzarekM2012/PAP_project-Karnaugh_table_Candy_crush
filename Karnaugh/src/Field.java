@@ -1,5 +1,6 @@
 package Karnaugh.src;
 
+// A class that stores data for a Karnaugh table tile
 public class Field {
     int value;
     ReplacementSource replacementSource;

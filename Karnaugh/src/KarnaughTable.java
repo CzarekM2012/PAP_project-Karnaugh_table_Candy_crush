@@ -7,18 +7,20 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+// 
 class KarnaughTable {
     private int xSize, ySize, fieldValuesNumber;
     private int indexToGrey[], greyToIndex[];
     private Set<ReplacementSource> replacementSourcesSet;
-    private Field board[][];
+    private Field board[][]; //
 
     public KarnaughTable(int bitsNumberX, int bitsNumberY, int fieldValuesNumber, int minPatternTileCount) throws IllegalArgumentException
     {
-        // I moved it here because I still don't know how it actually works, and can probably be initialised here
+        // Temporarily here, should be moved outside later
         Set<ReplacementSource> replacementSourcesSet = new HashSet<ReplacementSource>();
         replacementSourcesSet.addAll(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));
 
+        // Check if bit numbers are correct
         if (bitsNumberX + bitsNumberY <= countBits(Integer.MAX_VALUE) * 2 && fieldValuesNumber > 0 && !replacementSourcesSet.isEmpty()
             && !replacementSourcesSet.contains(ReplacementSource.Improper))
         {
@@ -26,11 +28,13 @@ class KarnaughTable {
             this.ySize = 1 << bitsNumberY;
             this.indexToGrey = new int[xSize];
             this.greyToIndex = new int[xSize];
-            setupArrayIndexToGreyCode();
+            setupArrayIndexToGreyCode(); // Grey code caching
             for (int i = 0; i < xSize; i++)
             {
                 greyToIndex[indexToGrey[i]] = i;
             }
+
+            // Initialising fields
             this.fieldValuesNumber = fieldValuesNumber;
             this.replacementSourcesSet = replacementSourcesSet;
             this.board = new Field[xSize][ySize];
@@ -41,10 +45,13 @@ class KarnaughTable {
                     board[i][j] = new Field();
                 }
             }
+
+            // Setting field values
             prepareBoardWithNoPatterns(minPatternTileCount);
         }
         else
         {
+            // Throw errors
             if (bitsNumberX + bitsNumberY > countBits(Integer.MAX_VALUE) * 2)
             {
                 throw new IllegalArgumentException("BitsNumber cannot be higher than 2*number_of_bits_in_Integer.MAX_VALUE");
@@ -64,6 +71,7 @@ class KarnaughTable {
         }
     }
 
+    // Counts the 1ns in a binary form of given number
     private int countBits(int number)
     {
         int bits = 0;
@@ -75,6 +83,7 @@ class KarnaughTable {
         return bits;
     }
 
+    // Gray code caching
     private void setupArrayIndexToGreyCode()
     {
         indexToGrey[0] = 0;
@@ -91,18 +100,24 @@ class KarnaughTable {
             j--;
         }
     }
+
+    // Randomise a board in such way that tiles don't form any pattern at least of given size
     private boolean prepareBoardWithNoPatterns(int minPatternTileCount) throws IllegalArgumentException
     {
-        if(minPatternTileCount%2 == 0 && minPatternTileCount < (this.xSize * this.ySize))
+        // Checks if minPatternTileCount is correct 
+        if(countBits(minPatternTileCount) == 1 && minPatternTileCount < (this.xSize * this.ySize))
         {
             Random generator = new Random();
             int[] valuesAppearanceCounts = new int[this.fieldValuesNumber];
             int minNeighboursPerPattern = 0;
+
+            // Calculates log2(minPatternTileCount)
             while(minPatternTileCount > 1)
             {
                 minNeighboursPerPattern++;
                 minPatternTileCount>>>=1;
             }
+            
             int size = replacementSourcesSet.size();
             ReplacementSource array[] = new ReplacementSource[size];
             replacementSourcesSet.toArray(array);
@@ -110,6 +125,7 @@ class KarnaughTable {
             {
                 for(int j=0; j<ySize; j++)
                 {
+                    // Counts neighbour tile values
                     int value;
                     List<Coord> neighourCoords = adjacentFields(new Coord(i, j));
                     for(Coord neighbourCoord : neighourCoords)
@@ -132,8 +148,10 @@ class KarnaughTable {
                     {
                         return false;
                     }
+
+                    // Set a random value that doesn't create a possibility of pattern creation 
                     value = generator.nextInt(this.fieldValuesNumber);
-                    while(valuesAppearanceCounts[value] >= minNeighboursPerPattern)
+                    while(valuesAppearanceCounts[value] >= minNeighboursPerPattern) //TODO: Make sure that this while doesn't create an endless loop
                     {
                         value = generator.nextInt(this.fieldValuesNumber);
                     }
@@ -152,8 +170,10 @@ class KarnaughTable {
         }
     }
 
-    public void fillWithRandoms()
+    // Fill empty tiles with random values
+    public ArrayList<Coord> fillWithRandoms()
     {
+        ArrayList<Coord> filledTiles = new ArrayList<Coord>();
         Random generator = new Random();
         int size = replacementSourcesSet.size();
         ReplacementSource array[] = new ReplacementSource[size];
@@ -166,30 +186,34 @@ class KarnaughTable {
                 if (board[i][j].equals(emptyField))
                 {
                     board[i][j].set(generator.nextInt(fieldValuesNumber), array[generator.nextInt(size)]);
+                    filledTiles.add(new Coord(i, j));
                 }
             }
         }
+        return filledTiles;
     }
 
     // Runs collapse() and transforms result into an Array of tiles which position changed during collapse
     public ArrayList<Coord> collapseGetTiles(int direction) {
         ArrayList<Coord> movedTiles = new ArrayList<Coord>();
         Coord[][] result = collapse(direction);
+        Coord empty = new Coord();
 
         for(int x = 0; x < xSize; ++x)
             for(int y = 0; y < ySize; ++y)
-                if(!result[x][y].equals(new Coord()))
+                if(!result[x][y].equals(empty))
                     movedTiles.add(new Coord(result[x][y]));
 
         return movedTiles;
     }
 
+    // Gravity - moves fields in the opposite of specified direction
     public Coord[][] collapse(int direction)
-    // moves fields in the opposite of specified direction
     // (if replacementSource equals ReplacementSource.Top, fields will be moving
     // down, etc.), if there are empty fields in that direction
     // TODO: change collapser position checking for it to not get blocked on edges when movig alongside them
     {
+        // Initialise result tab[][]
         Coord fieldsMovementBoard[][] = new Coord[xSize][ySize];
         for (int i = 0; i < xSize; i++)
         {
@@ -198,6 +222,7 @@ class KarnaughTable {
                 fieldsMovementBoard[i][j] = new Coord();
             }
         }
+
         Coord currentPosition, collapser = new Coord(), move, nextLine, fall;
         Field clearField = new Field();
         switch (direction)
@@ -227,22 +252,32 @@ class KarnaughTable {
                 fall = new Coord(-1, 0);
                 break;
         }
+
+        // Checks whole board (from 'currentPosition' moving by 'move') for tiles that can fall
         while (currentPosition.x >= 0 && currentPosition.x < xSize && currentPosition.y >= 0
                 && currentPosition.y < ySize)
         {
             collapser.set(currentPosition.x + fall.x, currentPosition.y + fall.y);
+            
+            // If collapsable
             if (!board[currentPosition.x][currentPosition.y].equals(clearField) && board[collapser.x][collapser.y].equals(clearField))
             {
+                // Moves tiles in 'fall' diretion until another non-empty tile or border is found
                 while (collapser.x >= 0 && collapser.x <= xSize - 1 && collapser.y > 0 && collapser.y < ySize - 1
                        && board[collapser.x + fall.x][collapser.y + fall.y].equals(clearField))
                 {
                     collapser.addTo(fall);
                 }
+
+                // Swap tile refernces (move tile)
                 Field temp = board[collapser.x][collapser.y];
                 board[collapser.x][collapser.y] = board[currentPosition.x][currentPosition.y];
                 board[currentPosition.x][currentPosition.y] = temp;
+
+                // Add to result
                 fieldsMovementBoard[currentPosition.x][currentPosition.y].set(collapser.x, collapser.y);
             }
+
             currentPosition.addTo(move);
             if (currentPosition.x == xSize || currentPosition.y == ySize)
             {
@@ -252,37 +287,9 @@ class KarnaughTable {
         return fieldsMovementBoard;
     }
 
-    public boolean isMovePossible()
-    // returns true if, there is field that has 2 adjacent fields with the same
-    // value, false otherwise
-    {
-        int valuesCountArray[] = new int[this.fieldValuesNumber];
-        for (int i = 0; i < xSize; i++)
-        {
-            for (int j = 0; j < ySize; j++)
-            {
-                List<Coord> neighbours = adjacentFields(new Coord(i, j));
-                for (int k = 0; k < neighbours.size(); k++)
-                {
-                    Coord neighbour = neighbours.get(k);
-                    valuesCountArray[board[neighbour.x][neighbour.y].value]++;
-                }
-                for (int k = 0; k < this.fieldValuesNumber; k++)
-                {
-                    if (valuesCountArray[k] >= 2)
-                    {
-                        return true;
-                    }
-                    valuesCountArray[k] = 0;
-                }
-            }
-        }
-        return false;
-    }
 
+    // Clears fields at Coords in list and returns value of ReplacementSource that described most of them
     public ReplacementSource destroyFields(List<Coord> list)
-    // clears fields at Coords in list and returns value of ReplacementSource that
-    // described most of them
     {
         int replacementSourcesCounts[] = { 0, 0, 0, 0, 0 };
         for (int i = 0; i < list.size(); i++)
@@ -295,6 +302,8 @@ class KarnaughTable {
             }
             board[destroyed.x][destroyed.y].clear();
         }
+
+        // Returns replacement source that was most present in destroyed tiles
         int max = 0, index = 0;
         for (int i = 1; i < 5; i++)
         {
@@ -319,9 +328,8 @@ class KarnaughTable {
         }
     }
 
+    // Returns list of Coords of fields adjacent to field at startCoord according to Karnaugh table rules
     public ArrayList<Coord> adjacentFields(Coord startCoord)
-    // returns list of Coords of fields adjacent to field at startCoord according to
-    // Karnaugh table rules
     {
         ArrayList<Coord> destinatitionList = new ArrayList<Coord>();
         Coord greyStartCoord = new Coord(indexToGrey[startCoord.x], indexToGrey[startCoord.y]);
@@ -351,7 +359,8 @@ class KarnaughTable {
 
     // Finds all tile patterns that contain selected tile, skips ones that are fully included in other patterns
     // All patterns have to be at least 'minPatternTileCount' long to be considered
-    // TODO: make it so subpatterns of already existing bigger patterns are checked when inspecting moveCoord neighbour
+    // TODO: make it so that subpatterns of already existing bigger patterns are checked when inspecting moveCoord neighbour
+    // TODO: Document it better
     public ArrayList<ArrayList<Coord>> getPatternsContaining(Coord moveCoord, int minPatternTileCount)
     {
         int moveFieldValue = board[moveCoord.x][moveCoord.y].value;
@@ -361,14 +370,14 @@ class KarnaughTable {
         ArrayList<Coord> collectionPotentialNewFields = new ArrayList<Coord>();
         Coord greyDifference = new Coord();
         ArrayList<Coord> adjacentsToMoveCoord = adjacentFields(moveCoord);
+        
         for (int i = 0; i < adjacentsToMoveCoord.size(); i++)
         {
             Coord neighour = adjacentsToMoveCoord.get(i);
             if (moveFieldValue == board[neighour.x][neighour.y].value)
             {
                 greyDifference.set(greyMoveCoord.x ^ indexToGrey[neighour.x],
-                        greyMoveCoord.y ^ indexToGrey[neighour.y]); // get bit that differs between field an moveCoord
-                                                                    // from its neighbour
+                        greyMoveCoord.y ^ indexToGrey[neighour.y]); // get bit that differs between field an moveCoord from its neighbour 
                 boolean belongsToAnyExistingCollection = false; // we will need to create new collection
                 for (int j = 0; j < fieldsCollections.size(); j++)
                 {
@@ -406,7 +415,6 @@ class KarnaughTable {
 
     // Returns a list containing coords of every field to be destroyed together with given tile
     // only includes a single instance of each tile
-    // TODO: add pattern lenght checking
     public ArrayList<Coord> fieldsToDestroy(Coord tile, int minPatternTileCount)
     {
         ArrayList<ArrayList<Coord>> fieldsCollections = getPatternsContaining(tile, minPatternTileCount);
@@ -428,6 +436,7 @@ class KarnaughTable {
         return fieldsToDestroy;
     }
 
+    // Debug printouts
     public void printTile(Coord tile) {
         System.out.println("Tile: (" + tile.x + ", " + tile.y + "), value = " + board[tile.x][tile.y].value);
     }
@@ -466,10 +475,8 @@ class KarnaughTable {
         }
     }
 
-    public void set(Coord coord, Field field) throws IndexOutOfBoundsException {
-        board[coord.x][coord.y].set(field);
-    }
-
+    // Setters and getters
+    public void set(Coord coord, Field field) throws IndexOutOfBoundsException {board[coord.x][coord.y].set(field);}
     public void set(Field[][] newBoard) throws IndexOutOfBoundsException {
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
@@ -488,13 +495,6 @@ class KarnaughTable {
         return copy;
     }
 
-    public void swapTiles(Coord t1, Coord t2) {
-        Field tmp = board[t1.x][t1.y];
-        board[t1.x][t1.y] = board[t2.x][t2.y];
-        board[t2.x][t2.y] = tmp;
-    }
-
-    // Added some getters
     int getSizeX() {return xSize;}
     int getSizeY() {return ySize;}
     int getBitSizeX() {return xSize;} // Replace with correct later
@@ -502,6 +502,14 @@ class KarnaughTable {
 
     int getTileValue(int x, int y) {return board[x][y].value;}
     int getTileValue(Coord coord) {return board[coord.x][coord.y].value;}
+
+    int translateIndexToGrey(int index){return indexToGrey[index];}
+
+    public void swapTiles(Coord t1, Coord t2) {
+        Field tmp = board[t1.x][t1.y];
+        board[t1.x][t1.y] = board[t2.x][t2.y];
+        board[t2.x][t2.y] = tmp;
+    }
 
     public static void main(String args[]) {
         // testing area, erase later
