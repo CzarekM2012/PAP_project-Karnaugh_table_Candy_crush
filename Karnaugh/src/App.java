@@ -148,8 +148,8 @@ public class App extends Application {
                         lockClicking = true;
                         
                         // These coords tell which rectangle was pressed
-                        int xOfRctg = (int) ((event.getSceneX() - BASE_X_OFFSET)  / SQUARE_SIZE); // x coordinate of the rectangle
-                        int yOfRctg = (int) ((event.getSceneY() - BASE_Y_OFFSET)  / SQUARE_SIZE); // y ...
+                        int xOfRctg = (int) ((event.getSceneX() - BASE_X_OFFSET - event.getSceneX()/SQUARE_SIZE/MIRROR_FREQUENCY*MIRROR_SIZE)  / SQUARE_SIZE); // x coordinate of the rectangle
+                        int yOfRctg = (int) ((event.getSceneY() - BASE_Y_OFFSET - event.getSceneY()/SQUARE_SIZE/MIRROR_FREQUENCY*MIRROR_SIZE)  / SQUARE_SIZE); // y -|| -
                         //System.out.println("Clicked (" + xOfRctg + ", " + yOfRctg + ")");
 
                         // Game functions are started in a separate thread to keep the UI responsive
