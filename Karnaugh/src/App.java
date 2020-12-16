@@ -172,6 +172,7 @@ public class App extends Application {
         
         // Column labels
         for(int x = 0; x < WIDTH; x++){
+            // This warcrime of a string formatting oneliner takes the grey code represented by integer, translates it to binary and pads it with 0s
             TextField txt = new TextField((String.format("%" + START_TABLE_SIZE_X_BITS + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(x)))).replace(" ", "0"));
             txt.setEditable(false);
             
@@ -187,6 +188,7 @@ public class App extends Application {
 
         // Row labels
         for(int y = 0; y < WIDTH; y++){
+            // This warcrime of a string formatting oneliner takes the grey code represented by integer, translates it to binary and pads it with 0s
             TextField txt = new TextField((String.format("%" + START_TABLE_SIZE_Y_BITS + "s", Integer.toBinaryString(karnaugh.translateIndexToGrey(y)))).replace(" ", "0"));
             txt.setEditable(false);
 
