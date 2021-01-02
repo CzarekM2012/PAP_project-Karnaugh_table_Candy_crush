@@ -1,4 +1,4 @@
-package Karnaugh;
+package karnaugh;
 
 class ScoreBufferNode{
     public int value;

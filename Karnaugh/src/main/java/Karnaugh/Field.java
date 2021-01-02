@@ -1,4 +1,4 @@
-package Karnaugh;
+package karnaugh;
 
 // A class that stores data for a Karnaugh table tile
 class Field {

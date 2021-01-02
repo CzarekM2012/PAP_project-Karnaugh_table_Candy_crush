@@ -1,4 +1,4 @@
-package Karnaugh;
+package karnaugh;
 
 // Just an enum to store gravity direction
 // Accesed as "ReplacementSource.TOP"

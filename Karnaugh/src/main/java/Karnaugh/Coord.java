@@ -1,4 +1,4 @@
-package Karnaugh;
+package karnaugh;
 
 // Yet another implementation of Point class
 class Coord {

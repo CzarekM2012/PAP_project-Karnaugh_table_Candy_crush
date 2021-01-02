@@ -1,7 +1,5 @@
 package Karnaugh;
 
-import Karnaugh.KarnaughTable;
-
 class KarnaughTableTest
 {
     /*
