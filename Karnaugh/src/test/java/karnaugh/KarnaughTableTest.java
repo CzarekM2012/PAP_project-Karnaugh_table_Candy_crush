@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import org.junit.Test;
 
@@ -21,7 +22,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseTopDownSquare()
     {
-        KarnaughTable test = new KarnaughTable(2, 2, 1, 1);
+        KarnaughTable test = new KarnaughTable(2, 2, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, one},
@@ -50,7 +51,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseTopDownVerticalRectangle()
     {
-        KarnaughTable test = new KarnaughTable(2, 3, 1, 1);
+        KarnaughTable test = new KarnaughTable(2, 3, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {empty, empty, empty, one,   one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, empty, empty, one,   empty, one},
@@ -75,7 +76,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseTopDownHorizontalRectangle()
     {
-        KarnaughTable test = new KarnaughTable(3, 2, 1, 1);
+        KarnaughTable test = new KarnaughTable(3, 2, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, one},
@@ -108,7 +109,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseDownTopSquare()
     {
-        KarnaughTable test = new KarnaughTable(2, 2, 1, 1);
+        KarnaughTable test = new KarnaughTable(2, 2, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, one},
@@ -137,7 +138,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseDownTopVerticalRectangle()
     {
-        KarnaughTable test = new KarnaughTable(2, 3, 1, 1);
+        KarnaughTable test = new KarnaughTable(2, 3, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {empty, empty, empty, one,   one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, empty, empty, one,   empty, one},
@@ -162,7 +163,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseDownTopHorizontalRectangle()
     {
-        KarnaughTable test = new KarnaughTable(3, 2, 1, 1);
+        KarnaughTable test = new KarnaughTable(3, 2, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, one},
@@ -195,7 +196,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseLeftRightSquare()
     {
-        KarnaughTable test = new KarnaughTable(2, 2, 1, 1);
+        KarnaughTable test = new KarnaughTable(2, 2, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, one},
@@ -224,7 +225,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseLeftRightVerticalRectangle()
     {
-        KarnaughTable test = new KarnaughTable(2, 3, 1, 1);
+        KarnaughTable test = new KarnaughTable(2, 3, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {empty, empty, empty, one,   one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, empty, empty, one,   empty, one},
@@ -249,7 +250,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseLeftRightHorizontalRectangle()
     {
-        KarnaughTable test = new KarnaughTable(3, 2, 1, 1);
+        KarnaughTable test = new KarnaughTable(3, 2, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, one},
@@ -282,7 +283,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseRightLeftSquare()
     {
-        KarnaughTable test = new KarnaughTable(2, 2, 1, 1);
+        KarnaughTable test = new KarnaughTable(2, 2, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, one},
@@ -311,7 +312,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseRightLeftVerticalRectangle()
     {
-        KarnaughTable test = new KarnaughTable(2, 3, 1, 1);
+        KarnaughTable test = new KarnaughTable(2, 3, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {empty, empty, empty, one,   one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, empty, empty, one,   empty, one},
@@ -336,7 +337,7 @@ public class KarnaughTableTest
     @Test
     public void testCollapseRightLeftHorizontalRectangle()
     {
-        KarnaughTable test = new KarnaughTable(3, 2, 1, 1);
+        KarnaughTable test = new KarnaughTable(3, 2, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field empty = new Field(), one = new Field(1, ReplacementSource.Top);
         Field newBoard[][] = {  {one,   empty, empty, empty},//leftmost vertical row
                                 {empty, one,   empty, one},
@@ -371,12 +372,12 @@ public class KarnaughTableTest
     6   0 2 2 2 2 1 0 0 G:101
     7   1 1 2 0 0 1 1 1 G:100
     */
-    //TODO:przyjrzeć się powtórzeniom coordów, które powstają przy wykonaniu tego testu
     @Test
     public void testGetPatternsContainingSingular()
     {
-        KarnaughTable test = new KarnaughTable(3, 3, 2, 2);
+        KarnaughTable test = new KarnaughTable(3, 3, 2, 2, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field zero = new Field(0, ReplacementSource.Top), one = new Field(1, ReplacementSource.Top), two = new Field(2, ReplacementSource.Top);
+        test.clear();
         Field newBoard[][] = {  {one,  one,  one,  zero, zero, zero, zero, one},//leftmost vertical row
                                 {one,  one,  one,  two,  zero, zero, two,  one},
                                 {one,  one,  one,  two,  zero, one,  two,  two},
@@ -385,7 +386,7 @@ public class KarnaughTableTest
                                 {zero, two,  one,  one,  zero, zero, one,  one},
                                 {zero, one,  one,  zero, zero, zero, zero, one},
                                 {one,  zero, zero, zero, zero, zero, zero, one}};
-        test.set(newBoard);
+        test.set(new Coord(0, 0), newBoard);
         ArrayList<ArrayList<Coord>> patterns = test.getPatternsContaining(new Coord(1, 3));
         ArrayList<ArrayList<Coord>> correct = new ArrayList<ArrayList<Coord>>();
         correct.add(new ArrayList<Coord>(Arrays.asList(new Coord[] {new Coord(1, 3), new Coord(2, 3)})));
@@ -394,8 +395,9 @@ public class KarnaughTableTest
     @Test
     public void testGetPatternsContainingSingularTooSmall()
     {
-        KarnaughTable test = new KarnaughTable(3, 3, 2, 4);
+        KarnaughTable test = new KarnaughTable(4, 4, 4, 4, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field zero = new Field(0, ReplacementSource.Top), one = new Field(1, ReplacementSource.Top), two = new Field(2, ReplacementSource.Top);
+        test.clear();
         Field newBoard[][] = {  {one,  one,  one,  zero, zero, zero, zero, one},//leftmost vertical row
                                 {one,  one,  one,  two,  zero, zero, two,  one},
                                 {one,  one,  one,  two,  zero, one,  two,  two},
@@ -404,7 +406,7 @@ public class KarnaughTableTest
                                 {zero, two,  one,  one,  zero, zero, one,  one},
                                 {zero, one,  one,  zero, zero, zero, zero, one},
                                 {one,  zero, zero, zero, zero, zero, zero, one}};
-        test.set(newBoard);
+        test.set(new Coord(0, 0), newBoard);
         ArrayList<ArrayList<Coord>> patterns = test.getPatternsContaining(new Coord(1, 3));
         ArrayList<ArrayList<Coord>> correct = new ArrayList<ArrayList<Coord>>();
         assertEquals(correct, patterns);
@@ -412,8 +414,9 @@ public class KarnaughTableTest
     @Test
     public void testGetPatternsContainingMultiple()
     {
-        KarnaughTable test = new KarnaughTable(3, 3, 2, 2);
+        KarnaughTable test = new KarnaughTable(4, 4, 4, 4, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field zero = new Field(0, ReplacementSource.Top), one = new Field(1, ReplacementSource.Top), two = new Field(2, ReplacementSource.Top);
+        test.clear();
         Field newBoard[][] = {  {one,  one,  one,  zero, zero, zero, zero, one},//leftmost vertical row
                                 {one,  one,  one,  two,  zero, zero, two,  one},
                                 {one,  one,  one,  two,  zero, one,  two,  two},
@@ -422,20 +425,27 @@ public class KarnaughTableTest
                                 {zero, two,  one,  one,  zero, zero, one,  one},
                                 {zero, one,  one,  zero, zero, zero, zero, one},
                                 {one,  zero, zero, zero, zero, zero, zero, one}};
-        test.set(newBoard);
+        test.set(new Coord(0, 0), newBoard);
         ArrayList<ArrayList<Coord>> patterns = test.getPatternsContaining(new Coord(6, 4));
         ArrayList<ArrayList<Coord>> correct = new ArrayList<ArrayList<Coord>>();
-        correct.add(new ArrayList<Coord>(Arrays.asList(new Coord[] {new Coord(4, 4), new Coord(4, 5), new Coord(4, 6), new Coord(4, 7), new Coord(5, 4), new Coord(5, 5), new Coord(5, 6), new Coord(5, 7)})));
-        correct.add(new ArrayList<Coord>(Arrays.asList(new Coord[] {new Coord(6, 3), new Coord(6, 4), new Coord(7, 3), new Coord(7, 4)})));
-        correct.add(new ArrayList<Coord>(Arrays.asList(new Coord[] {new Coord(0, 4), new Coord(0, 5), new Coord(1, 4), new Coord(1, 5), new Coord(6, 4), new Coord(6, 5), new Coord(7, 4), new Coord(7, 5)})));
-        correct.add(new ArrayList<Coord>(Arrays.asList(new Coord[] {new Coord(1, 4), new Coord(2, 4), new Coord(5, 4), new Coord(6, 4)})));
-        assertEquals(correct, patterns);
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(4, 4), new Coord(5, 4), new Coord(6, 4), new Coord(7, 4),
+                         new Coord(4, 5), new Coord(5, 5), new Coord(6, 5), new Coord(7, 5)})));
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(6, 3), new Coord(6, 4), new Coord(7, 3), new Coord(7, 4)})));
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(0, 4), new Coord(0, 5), new Coord(1, 4), new Coord(1, 5),
+                         new Coord(6, 4), new Coord(6, 5), new Coord(7, 4), new Coord(7, 5)})));
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(1, 4), new Coord(2, 4), new Coord(5, 4), new Coord(6, 4)})));
+        assertTrue(coordArrayListsArrayListEquals(correct, patterns));
     }
     @Test
     public void testGetPatternsContainingMultipleWithTooSmall()
     {
-        KarnaughTable test = new KarnaughTable(3, 3, 2, 8);
+        KarnaughTable test = new KarnaughTable(4, 4, 4, 8, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
         Field zero = new Field(0, ReplacementSource.Top), one = new Field(1, ReplacementSource.Top), two = new Field(2, ReplacementSource.Top);
+        test.clear();
         Field newBoard[][] = {  {one,  one,  one,  zero, zero, zero, zero, one},//leftmost vertical row
                                 {one,  one,  one,  two,  zero, zero, two,  one},
                                 {one,  one,  one,  two,  zero, one,  two,  two},
@@ -444,9 +454,53 @@ public class KarnaughTableTest
                                 {zero, two,  one,  one,  zero, zero, one,  one},
                                 {zero, one,  one,  zero, zero, zero, zero, one},
                                 {one,  zero, zero, zero, zero, zero, zero, one}};
-        test.set(newBoard);
+        test.set(new Coord(0, 0), newBoard);
         ArrayList<ArrayList<Coord>> patterns = test.getPatternsContaining(new Coord(6, 4));
         ArrayList<ArrayList<Coord>> correct = new ArrayList<ArrayList<Coord>>();
-        assertEquals(correct, patterns);       
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(4, 4), new Coord(5, 4), new Coord(6, 4), new Coord(7, 4),
+                         new Coord(4, 5), new Coord(5, 5), new Coord(6, 5), new Coord(7, 5)})));
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(0, 4), new Coord(0, 5), new Coord(1, 4), new Coord(1, 5),
+                         new Coord(6, 4), new Coord(6, 5), new Coord(7, 4), new Coord(7, 5)})));
+        assertTrue(coordArrayListsArrayListEquals(correct, patterns));  
+    }
+
+    private boolean coordArrayListsArrayListEquals(ArrayList<ArrayList<Coord>> expected, ArrayList<ArrayList<Coord>> actual)
+    {
+        if(expected.size() != actual.size())
+        {
+            return false;
+        }
+        boolean available[] = new boolean[expected.size()];
+        for(int i=0; i<available.length; i++){available[i] = true;}
+        for(int i=0; i<expected.size(); i++)
+        {
+            boolean found = false;
+            int j=0;
+            while(!found && j < actual.size())
+            {
+                if(available[i] && coordArrayListEquals(expected.get(i), actual.get(j)))
+                {
+                    found = true;
+                    available[i] = false;
+                }
+                j++;
+            }
+            if(!found)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean coordArrayListEquals(ArrayList<Coord> expected, ArrayList<Coord> actual)
+    {
+        if(expected.size() != actual.size() || !(expected.containsAll(actual)))
+        {
+            return false;
+        }
+        return true;
     }
 }
