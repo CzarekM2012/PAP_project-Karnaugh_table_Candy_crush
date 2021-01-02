@@ -39,7 +39,18 @@ class Field {
         return replacementSource;
     }
 
-    public boolean equals(Field objField) {
-        return (value == objField.value && replacementSource.equals(replacementSource));
+    @Override
+    public boolean equals(Object objField)
+    {
+        if(super.equals(objField))
+        {
+            return true;
+        }
+        if(!(objField instanceof Field))
+        {
+            return false;
+        }
+        Field Field = (Field) objField;
+        return (value == Field.value && replacementSource.equals(Field.replacementSource));
     }
 }

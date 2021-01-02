@@ -1,6 +1,6 @@
 package karnaugh;
 
-// Yet another implementation of Point class
+/** Yet another implementation of Point class */
 class Coord {
     public int x, y;
 
@@ -16,8 +16,9 @@ class Coord {
         set(coord);
     }
 
-    //this+=addendCoord equivalent
-    public void addTo(Coord addendCoord) {
+    /** this+=addendCoord equivalent */
+    public void addTo(Coord addendCoord)
+    {
         x += addendCoord.x;
         y += addendCoord.y;
     }
