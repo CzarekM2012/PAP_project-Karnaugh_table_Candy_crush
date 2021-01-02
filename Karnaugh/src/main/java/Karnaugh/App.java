@@ -293,7 +293,7 @@ public class App extends Application {
        
 
         // Check whether, after the swap that occured in the logical model, there are any DESTRUCTION possibilities
-        if(karnaugh.fieldsToDestroy(firstTile, MIN_PATTERN_SIZE).size() == 0 && karnaugh.fieldsToDestroy(secondTile, MIN_PATTERN_SIZE).size() == 0){
+        if(karnaugh.fieldsToDestroy(firstTile).size() == 0 && karnaugh.fieldsToDestroy(secondTile).size() == 0){
             // if not - reverse the swap as if nothing happened
             karnaugh.swapTiles(firstTile, secondTile);
             sleep(ANIMATION_DELAY);
@@ -310,7 +310,7 @@ public class App extends Application {
             for(Coord tile : movedTiles) {
                 int lastSize = tilesToDestroy.size();
                 
-                ArrayList<Coord> toAdd = karnaugh.fieldsToDestroy(tile, MIN_PATTERN_SIZE);
+                ArrayList<Coord> toAdd = karnaugh.fieldsToDestroy(tile);
                 toAdd.removeAll(tilesToDestroy); // Removing duplicates
                 tilesToDestroy.addAll(toAdd);
 
