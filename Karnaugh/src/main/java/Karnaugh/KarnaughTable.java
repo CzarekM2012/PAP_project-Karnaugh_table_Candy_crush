@@ -442,22 +442,18 @@ public class KarnaughTable {
     }
 
     /**Returns a list containing coords of every field to be destroyed
-     * together with given tile only includes a single instance of each tile*/
+     * together with given tile, includes a single instance of each tile*/
     public ArrayList<Coord> fieldsToDestroy(Coord tile)
     {
         ArrayList<ArrayList<Coord>> fieldsCollections = getPatternsContaining(tile);
         ArrayList<Coord> fieldsToDestroy = new ArrayList<>();
 
-        for (int i = 0; i < fieldsCollections.size(); i++) {
-            
-            // Take only patterns that have at least 'minPatternTileCount' tiles
-            if(fieldsCollections.get(i).size() < this.minPatternTileCount)
-                continue;
-            
-            for (int j = 0; j < fieldsCollections.get(i).size(); j++) {
-                Coord inspected = fieldsCollections.get(i).get(j);
-                if (!fieldsToDestroy.contains(inspected)) {
-                    fieldsToDestroy.add(inspected);
+        for (ArrayList<Coord> pattern : fieldsCollections)
+        {           
+            for (Coord tileCoord : pattern)
+            {
+                if (!fieldsToDestroy.contains(tileCoord)) {
+                    fieldsToDestroy.add(tileCoord);
                 }
             }
         }
