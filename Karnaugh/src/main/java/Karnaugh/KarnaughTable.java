@@ -110,7 +110,7 @@ public class KarnaughTable {
         }
     }
 
-    // Randomise a board in such way that tiles don't form any pattern at least of given size
+    /** Randomise a board in such way that tiles don't form any pattern of size this.minPatternTileCount or smaller */
     private void prepareBoardWithNoPatterns() throws AssertionError
     {
         Random generator = new Random();
@@ -168,7 +168,7 @@ public class KarnaughTable {
         }
     }
 
-    // Fill empty tiles with random values
+    /** Fill empty tiles with random values */
     public ArrayList<Coord> fillWithRandoms()
     {
         ArrayList<Coord> filledTiles = new ArrayList<Coord>();
@@ -191,8 +191,10 @@ public class KarnaughTable {
         return filledTiles;
     }
 
-    /** Runs collapse() and transforms result into an Array of tiles which position changed during collapse */
-    public ArrayList<Coord> collapseGetTiles(ReplacementSource replacementSource) {
+    /** Runs collapse(replacementSource) 
+     * @return result collapse(replacementSource) transformed into a list of coords of tiles that moved during collapse */
+    public ArrayList<Coord> collapseGetTiles(ReplacementSource replacementSource) throws IllegalArgumentException
+    {
         ArrayList<Coord> movedTiles = new ArrayList<Coord>();
         Coord[][] result;
         try
@@ -211,9 +213,8 @@ public class KarnaughTable {
         return movedTiles;
     }
 
-    /** move fields in the opposite of specified direction
-      * (if replacementSource equals ReplacementSource.Top, fields will be moving
-      * down, etc.), if there are empty fields in that direction.
+    /** move fields in the direction from specified side of board, 
+      * if there are empty fields in that direction.
       * @return array[xSize][ySize] containing Coord() if specific tile was not moved
       * or target coord of tile movement*/
     public Coord[][] collapse(ReplacementSource replacementSource) throws IllegalArgumentException
@@ -359,7 +360,6 @@ public class KarnaughTable {
         return destinatitionList;
     }
 
-    // TODO: Document it better
     /**Finds all tile patterns that contain tile at coord.
      * All patterns have to be at least 'minPatternTileCount' long to be considered.
      * Requires removing redundant coords before clearing tiles. */
@@ -522,12 +522,11 @@ public class KarnaughTable {
         }
     }
     public void clear() {
-        Field empty = new Field();
         for(int i=0; i<xSize; i++)
         {
             for(int j=0; j<ySize; j++)
             {
-                set(i, j, empty);
+                board[i][j].clear();
             }
         }
     }
@@ -576,10 +575,5 @@ public class KarnaughTable {
         Field tmp = board[t1.x][t1.y];
         board[t1.x][t1.y] = board[t2.x][t2.y];
         board[t2.x][t2.y] = tmp;
-    }
-    public static void main(String[] args)
-    {
-        KarnaughTable test = new KarnaughTable(4, 4, 2, 4, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
-        test.print();
     }
 }
