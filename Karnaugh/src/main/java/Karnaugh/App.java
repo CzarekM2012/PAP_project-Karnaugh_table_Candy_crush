@@ -64,16 +64,16 @@ public class App extends Application {
     int score = 0;
 
     // .fxml scene
-    //private static Scene scene;
+    private static Scene scene;
 
     static void setRoot(String fxml) throws IOException {
-         //scene.setRoot(loadFXML(fxml));
+         scene.setRoot(loadFXML(fxml));
     }
 
-    // private static Parent loadFXML(String fxml) throws IOException {
-    //     FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-    //     return fxmlLoader.load();
-    // }
+    private static Parent loadFXML(String fxml) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+        return fxmlLoader.load();
+    }
 
     public static void main(String[] args) {
         colorDict.put(0, Color.web("577590"));
@@ -97,9 +97,9 @@ public class App extends Application {
 
         // .fxml setup
         
-        //scene = new Scene(loadFXML("primary"), 640, 480);
-        //stage.setScene(scene);
-        //stage.show();
+        scene = new Scene(loadFXML("primary"), 640, 480);
+        primaryStage.setScene(scene);
+        
 
         // Initialising mechanics
         karnaugh = new KarnaughTable(START_TABLE_SIZE_X_BITS, START_TABLE_SIZE_Y_BITS, START_TABLE_VALUE_COUNT, MIN_PATTERN_SIZE, replacementSourcesSet);//TODO:podaje set
@@ -148,9 +148,9 @@ public class App extends Application {
 
         wholeLayout.getChildren().add(gameLayout);
         wholeLayout.getChildren().add(scorebarLayout);
-        Scene scene = new Scene(wholeLayout);
+        //Scene scene = new Scene(wholeLayout);
 
-        primaryStage.setScene(scene);
+        //primaryStage.setScene(scene);
 
 
         // Filling the layout with squares
