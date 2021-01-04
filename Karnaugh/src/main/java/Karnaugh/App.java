@@ -377,8 +377,6 @@ public class App extends Application {
             sleep(ANIMATION_DELAY);
             removeHighlights();
 
-            System.out.println("TEST");
-
         } while(!tilesToDestroy.isEmpty());
 
         lockClicking = false;
