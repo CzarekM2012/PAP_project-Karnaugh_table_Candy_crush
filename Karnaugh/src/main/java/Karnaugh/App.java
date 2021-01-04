@@ -36,6 +36,7 @@ public class App extends Application {
     static final int START_TABLE_SIZE_Y_BITS = 3;
     static final int START_TABLE_VALUE_COUNT = 4; // How many logic values (tile colors) should be there
     static final int MIN_PATTERN_SIZE = 4; // Pattern has to be at least this size to be scored
+    static final float wildFieldChance = 0.05f;
     static final Set<ReplacementSource> replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));//TODO:miało być na zewnątrz, więc jest tutaj
 
     // Default UI element sizes and offsets
@@ -102,7 +103,7 @@ public class App extends Application {
         //stage.show();
 
         // Initialising mechanics
-        karnaugh = new KarnaughTable(START_TABLE_SIZE_X_BITS, START_TABLE_SIZE_Y_BITS, START_TABLE_VALUE_COUNT, MIN_PATTERN_SIZE, replacementSourcesSet);//TODO:podaje set
+        karnaugh = new KarnaughTable(START_TABLE_SIZE_X_BITS, START_TABLE_SIZE_Y_BITS, START_TABLE_VALUE_COUNT, MIN_PATTERN_SIZE, wildFieldChance, replacementSourcesSet);//TODO:podaje set
         //karnaugh.print();
 
         // Preparing window

@@ -8,20 +8,28 @@ import java.util.Random;
 import java.util.Set;
 
 public class KarnaughTable {
-    private int xSize, ySize, fieldValuesNumber, minPatternTileCount;
+    private int xSize, ySize, fieldValuesNumber, minPatternTileCount, wildTileChance/** wildTileChance/1000 probability*/;
     private int indexToGrey[], greyToIndex[];
     private Set<ReplacementSource> replacementSourcesSet;
-    private Field board[][]; //
+    private Field board[][];
+    public static final Field emptyField = new Field(), wildField = new Field(-2, ReplacementSource.None), blockadeField = new Field(-3, ReplacementSource.None);
 
-    public KarnaughTable(int bitsNumberX, int bitsNumberY, int fieldValuesNumber, int minPatternTileCount, Set<ReplacementSource> replacementSourcesSet) throws IllegalArgumentException, AssertionError
+    public KarnaughTable(int bitsNumberX, int bitsNumberY, int fieldValuesNumber, int minPatternTileCount, float wildTileChance, Set<ReplacementSource> replacementSourcesSet) throws IllegalArgumentException, AssertionError
     {
         if (bitsNumberX <= countBits(Integer.MAX_VALUE) && bitsNumberY <= countBits(Integer.MAX_VALUE) /*physical limitation for number of tiles*/
-            && !replacementSourcesSet.isEmpty() && !replacementSourcesSet.contains(ReplacementSource.Improper) /*assigning proper values to tiles*/
+            && !replacementSourcesSet.isEmpty() && !replacementSourcesSet.contains(ReplacementSource.Improper) && !replacementSourcesSet.contains(ReplacementSource.None) /*assigning replacement sources to tiles*/
             && countBits(minPatternTileCount) == 1 /*patterns correct according to Karnaugh Table rules*/
+            && wildTileChance >= 0 && wildTileChance <= 1 /*mathematically proper probability of wildTile spawning, for the sake of gameplay do not assign values that are higher than 5%*/
             && fieldValuesNumber > 1 && minPatternTileCount < (1 << (bitsNumberX + bitsNumberY)) && minPatternTileCount > 1 /*conditions for gameplay*/)
         {
             this.xSize = 1 << bitsNumberX; // left shift - equivalent to (int)math.pow(2, bitsNumberX);
             this.ySize = 1 << bitsNumberY;
+            
+            this.fieldValuesNumber = fieldValuesNumber;
+            this.minPatternTileCount = minPatternTileCount;
+            this.wildTileChance = (int)wildTileChance * 1000;
+            this.replacementSourcesSet = replacementSourcesSet;
+            
             int longerEdge = xSize>ySize?xSize:ySize;
             this.indexToGrey = new int[longerEdge];
             this.greyToIndex = new int[longerEdge];
@@ -32,9 +40,6 @@ public class KarnaughTable {
             }
 
             // Initialising fields
-            this.minPatternTileCount = minPatternTileCount;
-            this.fieldValuesNumber = fieldValuesNumber;
-            this.replacementSourcesSet = replacementSourcesSet;
             this.board = new Field[xSize][ySize];
             for (int i = 0; i < xSize; i++)
             {
@@ -76,6 +81,10 @@ public class KarnaughTable {
             if(countBits(minPatternTileCount) != 1 || minPatternTileCount < 1 || minPatternTileCount > 1 << (bitsNumberX + bitsNumberY))
             {
                 throw new IllegalArgumentException("minPatternTileCount needs to be a power of 2 higher than 1 and lower than 2^(bitsNumberX + bitsNumberY)");
+            }
+            if(wildTileChance < 0 || wildTileChance > 1)
+            {
+                throw new IllegalArgumentException("wildTileChance needs to be between 0 and 1(inclusive)");
             }
         }
     }
@@ -176,7 +185,6 @@ public class KarnaughTable {
         int numberOfReplacementSources = replacementSourcesSet.size();
         ReplacementSource replacementSourcesArray[] = new ReplacementSource[numberOfReplacementSources];
         replacementSourcesSet.toArray(replacementSourcesArray);
-        Field emptyField = new Field();
         for (int i = 0; i < xSize; i++)
         {
             for (int j = 0; j < ySize; j++)
@@ -184,6 +192,10 @@ public class KarnaughTable {
                 if (board[i][j].equals(emptyField))
                 {
                     board[i][j].set(generator.nextInt(fieldValuesNumber), replacementSourcesArray[generator.nextInt(numberOfReplacementSources)]);
+                    if(generator.nextInt(1000) < wildTileChance)
+                    {
+                        board[i][j].set(wildField);
+                    }
                     filledTiles.add(new Coord(i, j));
                 }
             }
@@ -263,7 +275,6 @@ public class KarnaughTable {
             default:
                 throw new IllegalArgumentException("Argument has to be one of proper replacement sources");
         }
-        Field clearField = new Field();
         // Checks whole board (from 'currentPosition' moving by 'move') for tiles that can fall
         while (currentPosition.x >= 0 && currentPosition.x < xSize && currentPosition.y >= 0
                 && currentPosition.y < ySize)
@@ -271,11 +282,12 @@ public class KarnaughTable {
             collapser.set(currentPosition.x + fall.x, currentPosition.y + fall.y);;
             
             // If collapsable
-            if (!board[currentPosition.x][currentPosition.y].equals(clearField) && board[collapser.x][collapser.y].equals(clearField))
+            if (!board[currentPosition.x][currentPosition.y].equals(emptyField) && !board[currentPosition.x][currentPosition.y].equals(blockadeField)
+                && board[collapser.x][collapser.y].equals(emptyField))
             {
                 // Moves tiles in 'fall' diretion until another non-empty tile or border is found
                 while (!(collapser.x == fallLimit.x || collapser.y == fallLimit.y) //one will trigger at edge, but to know which one, if with "fall" would be required, this is faster
-                       && board[collapser.x + fall.x][collapser.y + fall.y].equals(clearField))
+                       && board[collapser.x + fall.x][collapser.y + fall.y].equals(emptyField))
                 {
                     collapser.addTo(fall);
                 }
@@ -301,10 +313,10 @@ public class KarnaughTable {
         int replacementSourcesCounts[] = {0, 0, 0, 0, 0};
         for (Coord destroyed : list)
         {
-            if(board[destroyed.x][destroyed.y].replacementSource.id != -1) // Added a safeguard
-            {
-                replacementSourcesCounts[board[destroyed.x][destroyed.y].replacementSource.id]++;
-            }
+            /*if(board[destroyed.x][destroyed.y].replacementSource.id != -1)
+            {*/
+            replacementSourcesCounts[board[destroyed.x][destroyed.y].replacementSource.id]++;
+            /*}*/
             board[destroyed.x][destroyed.y].clear();
         }
 
@@ -365,76 +377,104 @@ public class KarnaughTable {
      * Requires removing redundant coords before clearing tiles. */
     public ArrayList<ArrayList<Coord>> getPatternsContaining(Coord choosenFieldCoord)
     {
-        int choosenFieldValue = board[choosenFieldCoord.x][choosenFieldCoord.y].value;
         Coord greyChoosenFieldCoord = new Coord(indexToGrey[choosenFieldCoord.x], indexToGrey[choosenFieldCoord.y]);
-        ArrayList<ArrayList<Coord>> patterns = new ArrayList<ArrayList<Coord>>();
         ArrayList<Coord> patternExpansion = new ArrayList<Coord>();
-        ArrayList<Coord> adjacentsToChoosenFieldCoord = adjacentFields(choosenFieldCoord);
         Coord greyCodeDifference = new Coord();
         
-        for (Coord neighbour : adjacentsToChoosenFieldCoord)
+        ArrayList<ArrayList<Coord>> patterns = getCompatiblePairsTileNeighbour(choosenFieldCoord);
+        //merge pairs
+        int compatibleNeighboursNumber = patterns.size();
+        for(int i=0; i < compatibleNeighboursNumber; i++)
         {
-            if (choosenFieldValue == board[neighbour.x][neighbour.y].value)
+            ArrayList<Coord> expander = patterns.get(i);
+            for(int j=i+1; j < patterns.size(); j++)
             {
-                /*
-                * ^ - XOR operator:
-                * True ^ True -> False
-                * True ^ False -> True
-                * False ^ True -> True
-                * False ^ False -> False
-                */
-                // get bit in Grey Code that differs between fields at choosenCoord and neighbour
-                greyCodeDifference.set(greyChoosenFieldCoord.x ^ indexToGrey[neighbour.x], 
-                                       greyChoosenFieldCoord.y ^ indexToGrey[neighbour.y]);
-                int limit = patterns.size();//new collections will be added inside loop, but they shouldn't be inspected
-                for (int i = 0; i < limit; i++)
+                ArrayList<Coord> expanded = patterns.get(j);
+                if(!expanded.contains(expander.get(1)))
                 {
-                    boolean belongsToThisPattern = true;
-                    ArrayList<Coord> pattern = patterns.get(i);
-                    int j = 0;
-                    while(belongsToThisPattern && j < pattern.size())
+                    boolean compatiblePatterns = true;
+                    Coord expandingTileCoord = expander.get(1);
+                    int expandedPatternValue = board[expanded.get(1).x][expanded.get(1).y].value;
+                    /*
+                     * ^ - XOR operator:
+                     * True ^ True -> False
+                     * True ^ False -> True
+                     * False ^ True -> True
+                     * False ^ False -> False
+                     */
+                    greyCodeDifference.set(greyChoosenFieldCoord.x ^ indexToGrey[expandingTileCoord.x], 
+                                           greyChoosenFieldCoord.y ^ indexToGrey[expandingTileCoord.y]);
+                    int k=0;
+                    while(compatiblePatterns && k < expanded.size())
                     {
-                        Coord inspected = new Coord(pattern.get(j));
+                        Coord inspected = new Coord(expanded.get(k));
                         /* transform "inspected" to Grey code, change bit pointed by "greyDifference" and transform to index.
                            "inspected" becomes it's own neighbour with the same bit difference in Grey Code as the one between
-                           "choosenFieldCoord" and "neighbour"*/
+                           "choosenFieldCoord" and "expandingTile"*/
                         inspected.set(greyToIndex[indexToGrey[inspected.x] ^ greyCodeDifference.x],
                                       greyToIndex[indexToGrey[inspected.y] ^ greyCodeDifference.y]);
-                        if (board[inspected.x][inspected.y].value != choosenFieldValue)
+                        if(board[inspected.x][inspected.y].value != expandedPatternValue && !board[inspected.x][inspected.y].equals(wildField))
                         {
-                            belongsToThisPattern = false;
+                            compatiblePatterns = false;
                         }
                         patternExpansion.add(inspected);
-                        j++;
+                        k++;
                     }
-                    if (belongsToThisPattern)
+                    if(compatiblePatterns)
                     {
                         ArrayList<Coord> newCollection = new ArrayList<Coord>();
-                        newCollection.addAll(patterns.get(i));
+                        newCollection.addAll(expanded);
                         newCollection.addAll(patternExpansion);
                         patterns.add(newCollection);
                     }
                     patternExpansion.clear();
                 }
-                patterns.add(new ArrayList<Coord>(Arrays.asList(choosenFieldCoord, neighbour)));
             }
         }
         filterOutUnnecesaryPatterns(patterns);
         return patterns;
     }
+
+    /** @return list of pairs of Coords of "tileCoord" and its neighbour that can be in the same pattern */
+    private ArrayList<ArrayList<Coord>> getCompatiblePairsTileNeighbour(Coord tileCoord)
+    {
+        ArrayList<ArrayList<Coord>> pairs = new ArrayList<ArrayList<Coord>>();
+        ArrayList<Coord> neighbouringTilesCoords = adjacentFields(tileCoord);
+        Field tile = board[tileCoord.x][tileCoord.y];
+        for(Coord neighbour : neighbouringTilesCoords)
+        {
+            Field nTile = board[neighbour.x][neighbour.y];
+            if((tile.equals(wildField) || tile.value == nTile.value || nTile.equals(wildField)) && !nTile.equals(emptyField) && !nTile.equals(blockadeField))
+            pairs.add(new ArrayList<Coord>(Arrays.asList(tileCoord, neighbour)));
+        }
+        return pairs;
+    }
     
     /** Filter out subpatterns and too small patterns */
     private void filterOutUnnecesaryPatterns(ArrayList<ArrayList<Coord>> patterns)
     {
-        ArrayList<ArrayList<Coord>> unnecesaryPatterns = new ArrayList<ArrayList<Coord>>();
+        HashSet<ArrayList<Coord>> unnecesaryPatterns = new HashSet<ArrayList<Coord>>();
+        /*Since we are discarding patterns based on their size and relationship between them,
+          discarding those that are too small first should speed up the whole process*/
+        for(ArrayList<Coord> pattern : patterns)
+        {
+            if(pattern.size() < this.minPatternTileCount)
+            {
+                unnecesaryPatterns.add(pattern);
+            }
+        }
+        patterns.removeAll(unnecesaryPatterns);
+        unnecesaryPatterns.clear();
         for(ArrayList<Coord> containing : patterns)
         {
-            for(ArrayList<Coord> contained : patterns)
+            if(!unnecesaryPatterns.contains(containing))
             {
-                if(contained.size()<this.minPatternTileCount
-                   || (containing != contained && containing.size() >= contained.size() && containing.containsAll(contained)))
+                for(ArrayList<Coord> contained : patterns)
                 {
-                    unnecesaryPatterns.add(contained);
+                    if(containing != contained && containing.size() >= contained.size() && containing.containsAll(contained))
+                    {
+                        unnecesaryPatterns.add(contained);
+                    }
                 }
             }
         }
@@ -475,9 +515,27 @@ public class KarnaughTable {
 
     public void print() {
         for (int i = 0; i < ySize; i++) {
-            for (int j = 0; j < xSize; j++) {
-                System.out.print(board[j][i].value);
-                switch (board[j][i].replacementSource.id) {
+            for (int j = 0; j < xSize; j++){
+                switch(board[j][i].value)
+                {
+                    case -3:
+                        System.out.print("b");
+                        break;
+                    case -2:
+                        System.out.print("w");
+                        break;
+                    case -1:
+                        System.out.print("e");
+                        break; 
+                    default:
+                        System.out.print(board[j][i].value);
+                        break;
+                }
+                switch(board[j][i].replacementSource.id)
+                {
+                    case 0:
+                        System.out.print("non ");
+                        break;
                     case 1:
                         System.out.print("top ");
                         break;
