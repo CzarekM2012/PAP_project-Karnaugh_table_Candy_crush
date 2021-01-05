@@ -623,6 +623,38 @@ public class KarnaughTableTest
         assertTrue(coordArrayListsArrayListEquals(correct, patterns));
     }
 
+    /*
+    10
+    01
+    */
+    @Test
+    public void testIsMovePossiblePositive()
+    {
+        KarnaughTable test = new KarnaughTable(1, 1, 10, 2, 0f, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
+        test.clear();
+        Field zero = new Field(0, ReplacementSource.Top), one = new Field(1, ReplacementSource.Top);
+        Field newBoard[][] = {  {one,   zero},//leftmost vertical row
+                                {zero,  one}};
+        test.set(newBoard);
+        assertTrue(test.isMovePossible());
+    }
+
+    /*
+    01
+    23
+    */
+    @Test
+    public void testIsMovePossibleNegative()
+    {
+        KarnaughTable test = new KarnaughTable(1, 1, 10, 2, 0f, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
+        test.clear();
+        Field zero = new Field(0, ReplacementSource.Top), one = new Field(1, ReplacementSource.Top), two = new Field(2, ReplacementSource.Top), three = new Field(3, ReplacementSource.Top);
+        Field newBoard[][] = {  {zero,  one},//leftmost vertical row
+                                {two,   three}};
+        test.set(newBoard);
+        assertTrue(!test.isMovePossible());
+    }
+
     private boolean coordArrayListsArrayListEquals(ArrayList<ArrayList<Coord>> expected, ArrayList<ArrayList<Coord>> actual)
     {
         if(expected.size() != actual.size())
