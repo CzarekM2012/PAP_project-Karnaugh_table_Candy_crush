@@ -10,9 +10,7 @@
     -fx-font-size: 40pt;
     -fx-font-family: sans-serif;
     -fx-padding: 50 0 50 0;
-    /*-fx-background-image: url(./images/button_bg.png);
-    */
- 
+
     -fx-background-size: cover;
 }
 
