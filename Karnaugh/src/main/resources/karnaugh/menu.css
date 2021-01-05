@@ -23,7 +23,7 @@
 }
 
 #highscoreButton {
-    -fx-pref-width: 300px;
+    -fx-pref-width: 300;
     -fx-font-size: 20pt;
     -fx-font-family: sans-serif;
     -fx-background-radius: 30,30,30,30;
