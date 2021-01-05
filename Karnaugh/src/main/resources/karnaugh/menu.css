@@ -3,8 +3,6 @@
    -fx-background-size: cover;
 }
 
-
-
 #gameTitle {
     -fx-text-fill: red;
     -fx-font-size: 40pt;
@@ -37,4 +35,14 @@
     -fx-background-radius: 30,30,30,30;
     -fx-background-color: #eb3467;
     -fx-graphic: url('./images/quit.png');
+}
+
+#startButton:hover {
+    -fx-pref-width: 400;
+}
+#highscoreButton:hover {
+    -fx-pref-width: 400;
+}
+#quitButton:hover {
+    -fx-pref-width: 400;
 }
