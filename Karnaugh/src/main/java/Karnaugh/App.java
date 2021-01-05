@@ -112,7 +112,8 @@ public class App extends Application {
     }
     
     static public void showHighscores(){
-    }
+        
+    } 
 
     static public void quitGame(){
         Platform.exit();

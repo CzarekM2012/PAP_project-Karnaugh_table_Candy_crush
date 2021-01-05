@@ -5,44 +5,33 @@
 
 #gameTitle {
     -fx-text-fill: red;
+    -fx-stroke: white;
+    -fx-stroke-size: 20px;
+
     -fx-font-size: 40pt;
     -fx-font-family: sans-serif;
     -fx-padding: 50 0 50 0;
-
-    -fx-background-size: cover;
 }
-
-#startButton {
+.button{
     -fx-pref-width: 300px;
     -fx-font-size: 20pt;
     -fx-font-family: sans-serif;
     -fx-background-radius: 30,30,30,30;
+}
+
+.button:hover{
+    -fx-pref-width: 400;
+}
+
+#startButton {
     -fx-graphic: url('./images/start.png');
 }
 
 #highscoreButton {
-    -fx-pref-width: 300;
-    -fx-font-size: 20pt;
-    -fx-font-family: sans-serif;
-    -fx-background-radius: 30,30,30,30;
     -fx-graphic: url('./images/highscores.png');
 }
 
 #quitButton {
-    -fx-pref-width: 300px;
-    -fx-font-size: 20pt;
-    -fx-font-family: sans-serif;
-    -fx-background-radius: 30,30,30,30;
     -fx-background-color: #eb3467;
     -fx-graphic: url('./images/quit.png');
-}
-
-#startButton:hover {
-    -fx-pref-width: 400;
-}
-#highscoreButton:hover {
-    -fx-pref-width: 400;
-}
-#quitButton:hover {
-    -fx-pref-width: 400;
 }
