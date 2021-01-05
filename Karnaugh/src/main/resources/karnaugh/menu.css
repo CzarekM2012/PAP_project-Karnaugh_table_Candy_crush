@@ -3,11 +3,14 @@
    -fx-background-size: cover;
 }
 
+#gameTitle .text{
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+}
 #gameTitle {
-    -fx-text-fill: red;
     -fx-stroke: white;
-    -fx-stroke-size: 20px;
-
+    -fx-stroke-width: 20;
+    -fx-text-fill: linear-gradient(from 0% 0% to 100% 100%, yellow 0%, red 100%);
     -fx-font-size: 40pt;
     -fx-font-family: sans-serif;
     -fx-padding: 50 0 50 0;
