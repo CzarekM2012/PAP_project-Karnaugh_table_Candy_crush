@@ -4,6 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.annotation.Retention;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -636,7 +637,10 @@ public class KarnaughTableTest
         Field newBoard[][] = {  {one,   zero},//leftmost vertical row
                                 {zero,  one}};
         test.set(newBoard);
-        assertTrue(test.isMovePossible());
+        boolean movePossible = test.isMovePossible();
+        Field afterCheck[][] = test.get();
+        boolean unchanged = boardsEquals(newBoard, afterCheck);
+        assertTrue(movePossible && unchanged);
     }
 
     /*
@@ -652,7 +656,10 @@ public class KarnaughTableTest
         Field newBoard[][] = {  {zero,  one},//leftmost vertical row
                                 {two,   three}};
         test.set(newBoard);
-        assertTrue(!test.isMovePossible());
+        boolean movePossible = test.isMovePossible();
+        Field afterCheck[][] = test.get();
+        boolean unchanged = boardsEquals(newBoard, afterCheck);
+        assertTrue(!movePossible && unchanged);
     }
 
     private boolean coordArrayListsArrayListEquals(ArrayList<ArrayList<Coord>> expected, ArrayList<ArrayList<Coord>> actual)
@@ -691,5 +698,33 @@ public class KarnaughTableTest
             return false;
         }
         return true;
+    }
+
+    private boolean boardsEquals(Field[][] expected, Field[][] actual)
+    {
+        boolean result = true;
+        if(actual.length != expected.length)
+        {
+            result = false;
+        }
+        int i=0;
+        while(result && i<actual.length)
+        {
+            if(actual[i].length != expected[i].length)
+            {
+                result = false;
+            }
+            int j=0;
+            while(result && j<actual[i].length)
+            {
+                if(!expected[i][j].equals(actual[i][j]))
+                {
+                    result = false;
+                }
+                j++;
+            }
+            i++;
+        }
+        return result;
     }
 }
