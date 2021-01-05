@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
@@ -104,11 +105,18 @@ public class App extends Application {
       
         primaryStage.show();
     }
-
-    public void startGame(){
-
+    
+    
+    static public void startGame(){
+        
+    }
+    
+    static public void showHighscores(){
     }
 
+    static public void quitGame(){
+        Platform.exit();
+    }
 
     void setTileColor(int x, int y, Color color) {
         getRectangleAt(x, y).setFill(color);
