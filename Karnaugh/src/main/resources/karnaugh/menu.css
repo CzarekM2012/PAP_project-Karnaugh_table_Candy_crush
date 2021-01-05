@@ -1,0 +1,42 @@
+.root{
+   -fx-background-image: url('./images/menu_bg.png');
+   -fx-background-size: cover;
+}
+
+
+
+#gameTitle {
+    -fx-text-fill: red;
+    -fx-font-size: 40pt;
+    -fx-font-family: sans-serif;
+    -fx-padding: 50 0 50 0;
+    /*-fx-background-image: url(./images/button_bg.png);
+    */
+ 
+    -fx-background-size: cover;
+}
+
+#startButton {
+    -fx-pref-width: 300px;
+    -fx-font-size: 20pt;
+    -fx-font-family: sans-serif;
+    -fx-background-radius: 30,30,30,30;
+    -fx-graphic: url('./images/start.png');
+}
+
+#highscoreButton {
+    -fx-pref-width: 300px;
+    -fx-font-size: 20pt;
+    -fx-font-family: sans-serif;
+    -fx-background-radius: 30,30,30,30;
+    -fx-graphic: url('./images/highscores.png');
+}
+
+#quitButton {
+    -fx-pref-width: 300px;
+    -fx-font-size: 20pt;
+    -fx-font-family: sans-serif;
+    -fx-background-radius: 30,30,30,30;
+    -fx-background-color: #eb3467;
+    -fx-graphic: url('./images/quit.png');
+}

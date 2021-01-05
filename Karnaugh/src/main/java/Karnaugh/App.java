@@ -97,10 +97,16 @@ public class App extends Application {
         // Preparing window
         primaryStage.setTitle("Karnaugh");
 
-        scene = new Scene(loadFXML("primary"), 640, 480);
+        scene = new Scene(loadFXML("menu"), 640, 480);
+        
+
         primaryStage.setScene(scene);   
       
         primaryStage.show();
+    }
+
+    public void startGame(){
+
     }
 
 
