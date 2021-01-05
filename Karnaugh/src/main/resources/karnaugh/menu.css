@@ -7,13 +7,14 @@
     -fx-stroke: black;
     -fx-stroke-width: 2;
 }
+
+
+
 #gameTitle {
-    -fx-stroke: white;
-    -fx-stroke-width: 20;
     -fx-text-fill: linear-gradient(from 0% 0% to 100% 100%, yellow 0%, red 100%);
-    -fx-font-size: 40pt;
+    -fx-font-size: 50pt;
     -fx-font-family: sans-serif;
-    -fx-padding: 50 0 50 0;
+    -fx-padding: 30 0 30 0;
 }
 .button{
     -fx-pref-width: 300px;
@@ -23,7 +24,19 @@
 }
 
 .button:hover{
-    -fx-pref-width: 400;
+    -fx-pref-width: 400px;
+}
+
+#startButton:hover{
+    -fx-background-color: blue;
+}
+
+#highscoreButton:hover{
+    -fx-background-color: green;
+}
+
+#quitButton:hover{
+    -fx-background-color: red;
 }
 
 #startButton {

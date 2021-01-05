@@ -108,11 +108,11 @@ public class App extends Application {
     
     
     static public void startGame(){
-        
+
     }
     
     static public void showHighscores(){
-        
+
     } 
 
     static public void quitGame(){
