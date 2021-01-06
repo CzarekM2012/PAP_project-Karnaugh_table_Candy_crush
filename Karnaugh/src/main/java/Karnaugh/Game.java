@@ -37,7 +37,8 @@ import java.io.File;
 import java.util.Properties;
 import java.io.IOException;
 import java.util.Scanner;
-
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Game{
 
@@ -51,6 +52,10 @@ public class Game{
     int gravityType;                        // How Gravity should be handled
     int minPatternSize;                     // Pattern has to be at least this size to be scored
     float wildFieldChance;
+    float timeGainPerTile;                    // Player regains time for each tile (seconds)
+    float timeLimitMax;                       // Player cannot stack more time than this (seconds)
+    float timeGainMin;                        // How far time gain per pattern can be reduced (seconds) 
+    float timeGainDecrease;                 // How fast will time gain decrease (0.1 means 0.1s per second)
     Set<ReplacementSource> replacementSourcesSet;
 
     // Layout
@@ -70,17 +75,59 @@ public class Game{
     Button[] rectangles = new Button[tableWidth * tableHeight];         // array containing all buttons in the playable field
     ArrayList<Coord> highlightedTiles = new ArrayList<>();              // keeps track of which tiles are highlighted
     int score;
+    volatile float secondsRemaining;
+    volatile float timeGain;
     
     // Returns a reference to a rectangle on the board
     public Button getRectangleAt(int xRctg, int yRctg) {return rectangles[yRctg * tableWidth + xRctg];}
+
+    void onGameLost() {
+        System.out.println("Game Lost!\nScore: " + score);
+    }
+
+    void updateCountdown() {
+        System.out.println("Time remaining: " + secondsRemaining + ", Score: " + score);
+    }
+
+    synchronized void decreaseTimeGain() {
+        if(timeGain > timeGainMin)
+            timeGain -= timeGainDecrease;
+    };
+    synchronized void decreaseCountdown() {secondsRemaining -= 1;}
+    synchronized void increaseCountdown(float times) {
+        secondsRemaining += timeGain * times;
+        if(secondsRemaining > timeLimitMax)
+            secondsRemaining = timeLimitMax;
+    }
+    synchronized boolean isCountdownFinished() {return secondsRemaining < 0;}
 
     public void startGame() throws IOException{
 
         loadLevel(0);
 
         score = 0;
-        System.out.println("Starting game.");
+        System.out.println("Starting game");
         karnaugh = new KarnaughTable(tableBitSizeX, tableBitSizeY, tableValueCount, minPatternSize, wildFieldChance, replacementSourcesSet);
+
+        System.out.println("Starting timer");
+        secondsRemaining = timeLimitMax;    // Thread safe, no threads just yet
+        timeGain = timeGainPerTile;
+        Timer timer = new Timer(true);
+        TimerTask task = new TimerTask() {
+            public void run() {
+                if (isCountdownFinished()) {
+                    onGameLost();
+                    cancel();
+                    timer.cancel();
+                    timer.purge();
+                } else {
+                    updateCountdown();
+                    decreaseCountdown();
+                    decreaseTimeGain();
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(task, 0, 1000);
 
         HBox wholeLayout = new HBox(); // "topmost" layout; later used as the new root
 
@@ -360,6 +407,11 @@ public class Game{
             updateTable();
 
             addScore(tilesToDestroy.size());
+            System.out.println("TEST1");
+            increaseCountdown(tilesToDestroy.size());
+            System.out.println("TEST2");
+            updateCountdown();
+            System.out.println("TEST3");
             removeHighlights();
 
             // Destroy
@@ -460,6 +512,10 @@ public class Game{
         minPatternSize = Integer.parseInt(values.get("min pattern size"));
         gravityType = Integer.parseInt(values.get("gravity type"));
         wildFieldChance = Float.parseFloat(values.get("wild tile frequency"));
+        timeLimitMax = Float.parseFloat(values.get("time limit max"));
+        timeGainPerTile = Float.parseFloat(values.get("time gain per tile"));
+        timeGainMin = Float.parseFloat(values.get("time gain min"));
+        timeGainDecrease = Float.parseFloat(values.get("time gain decrease"));
 
         System.out.println(levelName);
         

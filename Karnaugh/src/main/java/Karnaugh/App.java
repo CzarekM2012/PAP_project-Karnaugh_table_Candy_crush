@@ -111,12 +111,6 @@ public class App extends Application {
         // }
     }
 
-    // Table fields' graphical representation
-    public Rectangle[] rectangles;
-
-    // Returns a reference to a rectangle on the board
-    public Rectangle getRectangleAt(int xRctg, int yRctg) {return rectangles[yRctg * tableWidth + xRctg];}
-
 
     @Override
     public void start(Stage primaryStage) throws IOException {

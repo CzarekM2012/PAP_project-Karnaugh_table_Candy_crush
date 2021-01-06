@@ -5,6 +5,10 @@ min pattern size = 4
 gravity type = 1
 wild tile frequency = 0.05
 special tile count = 4
+time limit max = 99
+time gain per tile = 4
+time gain min = 0.1
+time gain decrease = 0.03
 special tiles:
 2 2 block
 2 5 block
