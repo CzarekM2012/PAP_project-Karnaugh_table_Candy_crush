@@ -1,0 +1,19 @@
+name = level 1
+bitSizeX = 3
+bitSizeY = 3
+min pattern size = 4
+gravity type = 1
+wild tile frequency = 0.05
+special tile count = 4
+special tiles:
+2 2 block
+2 5 block
+5 2 block
+5 5 block
+use tile custom rarity = 1
+tile type count = 4
+tile probabilities:
+4
+2
+2
+1

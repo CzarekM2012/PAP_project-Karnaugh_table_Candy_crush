@@ -48,4 +48,10 @@ class Coord {
         Coord coord = (Coord)object;
         return (this.x == coord.x && this.y == coord.y);
     }
+
+    @Override
+    public int hashCode() {
+        int result = y * 1000 + x;  
+        return result;
+    }
 }
