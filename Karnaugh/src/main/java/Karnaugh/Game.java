@@ -156,22 +156,40 @@ public class Game{
                 
                 // adds reference to the button to the array; and then adds it to the layout at correct positions
                 rectangles[y * WIDTH + x] = btn;
+
                 gameLayout.add(btn, x+1, y +1); // "+1" as I'll soon add labels at x = 0 and y = 0;
 
                 // Rectangle input handling
                 btn.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        final int xOfRctg = (int) ((event.getSceneX())/ btn.getWidth()); // x coordinate of the rectangle
+                        if(lockClicking)
+                            return;
+                        lockClicking = true;
+                        
+                        // These coords tell which rectangle was pressed
+                        final int xOfRctg = (int) (((event.getSceneX()) - leftPad.getWidth())/ btn.getWidth()); // x coordinate of the rectangle
                         final int yOfRctg = (int) ((event.getSceneY())/ btn.getHeight()); 
             
                         System.out.println("Button at (" + xOfRctg +", " + yOfRctg + ") clicked.");
-
+						
+                        // Game functions are started in a separate thread to keep the UI responsive
+                        Task<Void> task = new Task<Void>() {
+                            @Override
+                            protected Void call() throws Exception {
+                                onTileSelected(xOfRctg, yOfRctg);
+                                return null;
+                            }
+                        };
+                        
+                        new Thread(task).start();
                     }
                 });
 
-                
             }
+
+
+   
         }
         
 
@@ -191,12 +209,14 @@ public class Game{
         
         sidebarLayout.getChildren().add(mainMenuButton);
 
-
         // applies .css styling to the scene
         App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
 
         // changes root of the scene to wholeLayout - the "topmost" parent layer of the game "scene"
         App.setLayoutAsScene(wholeLayout);
+
+        updateTable();
+
     }
 
 
@@ -220,8 +240,9 @@ public class Game{
         color = color.desaturate();
         color = color.desaturate();
         //TODO: check if works
-        return color.toString().substring(3, 9);
+        return color.toString().substring(2, 8);
     }
+
     void highlightTile(int x, int y) {
         //System.out.println("Highlighing " + x + ", " + y);
         highlightedTiles.add(new Coord(x, y));
