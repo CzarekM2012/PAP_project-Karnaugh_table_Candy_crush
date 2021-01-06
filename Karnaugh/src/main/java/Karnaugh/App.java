@@ -122,11 +122,7 @@ public class App extends Application {
     */
         primaryStage.show();
     }
-    
-    static public void startGame(){
-
-    }
-    
+     
     static public void showHighscores(){
 
     } 

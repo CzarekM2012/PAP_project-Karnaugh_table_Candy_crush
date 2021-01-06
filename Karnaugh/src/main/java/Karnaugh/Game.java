@@ -32,8 +32,10 @@ import javafx.fxml.FXMLLoader;
 
 import java.io.IOException;
 
+
 public class Game{
     KarnaughTable karnaugh; // represents logic beneath the game
+    public static Map<Integer, Color> colorDict = App.colorDict;    
 
     final int START_TABLE_SIZE_X_BITS = 3; // How to split bits between x and y axis in table
     final int START_TABLE_SIZE_Y_BITS = 3;
