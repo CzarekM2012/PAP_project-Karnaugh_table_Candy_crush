@@ -1,0 +1,77 @@
+.root{
+    -fx-background-image: url('./images/padding.jpg');
+    -fx-background-size: cover;
+}
+
+#main_menu_button{
+    -fx-background-color: rgb(150, 0, 0);
+    -fx-text-fill: white;
+    -fx-font-size: 12pt;
+}
+
+#main_menu_button:hover{
+    -fx-background-color: red;
+    -fx-cursor: hand;
+}
+
+
+#game .button{
+    -fx-background-radius: 0,0,0,0;
+    -fx-background-color: white;
+}
+
+
+#sidebar{
+    -fx-border-color: cyan;
+    -fx-border-width: 1;
+    -fx-background-color: lightgrey;
+}
+    
+ #rectangle{
+    -fx-border-color:black;
+    -fx-border-width: 1 1 1 1;
+}
+
+
+#rectangle_right{
+    -fx-border-color:black white black black;
+    -fx-border-width: 1 1 1 1;
+} 
+
+#rectangle_left{
+    -fx-border-color:black black black white;
+    -fx-border-width: 1 1 1 1;
+}
+
+#rectangle_top{
+    -fx-border-color:white black black black;
+    -fx-border-width: 1 1 1 1;
+}
+
+#rectangle_bottom{
+    -fx-border-color:black black white black;
+    -fx-border-width: 1 1 1 1;
+}
+
+
+#rectangle_right_bottom{
+    -fx-border-color:black white white black;
+    -fx-border-width: 1 1 1 1;
+}
+
+#rectangle_right_top{
+    -fx-border-color:white white black black;
+    -fx-border-width: 1 1 1 1;
+}
+
+#rectangle_left_bottom{
+    -fx-border-color:black black white white;
+    -fx-border-width: 1 1 1 1;
+}
+
+#rectangle_left_top{
+    -fx-border-color:white black black white;
+    -fx-border-width: 1 1 1 1;
+}
+
+
