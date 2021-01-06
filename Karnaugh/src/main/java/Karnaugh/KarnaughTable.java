@@ -500,6 +500,45 @@ public class KarnaughTable {
         return fieldsToDestroy;
     }
 
+    public boolean isMovePossible()
+    {
+        boolean moveFound = false;
+        int i=0, inspectedValue;
+        Coord inspected = new Coord();
+        while(!moveFound && i<this.xSize)
+        {
+            int j=0;
+            while(!moveFound && j<this.ySize)
+            {
+                inspected.set(i, j);
+                if(!board[inspected.x][inspected.y].equals(blockadeField))
+                {
+                    inspectedValue = board[inspected.x][inspected.y].value;
+                    ArrayList<Coord> neighboursCoords = adjacentFields(inspected);
+                    int neighboursNumber = neighboursCoords.size(), k=0;
+                    while(!moveFound && k<neighboursNumber)
+                    {
+                        Coord neighbour = neighboursCoords.get(k);
+                        if(inspectedValue != board[neighbour.x][neighbour.y].value
+                           && !board[neighbour.x][neighbour.y].equals(blockadeField))
+                        {
+                            swapTiles(inspected, neighbour);
+                            if(!getPatternsContaining(inspected).isEmpty())
+                            {
+                                moveFound = true;
+                            }
+                            swapTiles(inspected, neighbour);
+                        }
+                        k++;
+                    }
+                    j++;
+                }
+            }
+            i++;
+        }
+        return moveFound;
+    }
+
     // Debug printouts
     public void printTile(Coord tile) {
         System.out.println("Tile: (" + tile.x + ", " + tile.y + "), value = " + board[tile.x][tile.y].value);

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.annotation.Retention;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -623,6 +624,44 @@ public class KarnaughTableTest
         assertTrue(coordArrayListsArrayListEquals(correct, patterns));
     }
 
+    /*
+    10
+    01
+    */
+    @Test
+    public void testIsMovePossiblePositive()
+    {
+        KarnaughTable test = new KarnaughTable(1, 1, 10, 2, 0f, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
+        test.clear();
+        Field zero = new Field(0, ReplacementSource.Top), one = new Field(1, ReplacementSource.Top);
+        Field newBoard[][] = {  {one,   zero},//leftmost vertical row
+                                {zero,  one}};
+        test.set(newBoard);
+        boolean movePossible = test.isMovePossible();
+        Field afterCheck[][] = test.get();
+        boolean unchanged = boardsEquals(newBoard, afterCheck);
+        assertTrue(movePossible && unchanged);
+    }
+
+    /*
+    01
+    23
+    */
+    @Test
+    public void testIsMovePossibleNegative()
+    {
+        KarnaughTable test = new KarnaughTable(1, 1, 10, 2, 0f, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
+        test.clear();
+        Field zero = new Field(0, ReplacementSource.Top), one = new Field(1, ReplacementSource.Top), two = new Field(2, ReplacementSource.Top), three = new Field(3, ReplacementSource.Top);
+        Field newBoard[][] = {  {zero,  one},//leftmost vertical row
+                                {two,   three}};
+        test.set(newBoard);
+        boolean movePossible = test.isMovePossible();
+        Field afterCheck[][] = test.get();
+        boolean unchanged = boardsEquals(newBoard, afterCheck);
+        assertTrue(!movePossible && unchanged);
+    }
+
     private boolean coordArrayListsArrayListEquals(ArrayList<ArrayList<Coord>> expected, ArrayList<ArrayList<Coord>> actual)
     {
         if(expected.size() != actual.size())
@@ -659,5 +698,33 @@ public class KarnaughTableTest
             return false;
         }
         return true;
+    }
+
+    private boolean boardsEquals(Field[][] expected, Field[][] actual)
+    {
+        boolean result = true;
+        if(actual.length != expected.length)
+        {
+            result = false;
+        }
+        int i=0;
+        while(result && i<actual.length)
+        {
+            if(actual[i].length != expected[i].length)
+            {
+                result = false;
+            }
+            int j=0;
+            while(result && j<actual[i].length)
+            {
+                if(!expected[i][j].equals(actual[i][j]))
+                {
+                    result = false;
+                }
+                j++;
+            }
+            i++;
+        }
+        return result;
     }
 }
