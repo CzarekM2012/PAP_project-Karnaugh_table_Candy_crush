@@ -33,18 +33,53 @@ import java.io.IOException;
 public class Game{
     KarnaughTable karnaugh;
 
-    static final int START_TABLE_SIZE_X_BITS = 3; // How to split bits between x and y axis in table
-    static final int START_TABLE_SIZE_Y_BITS = 3;
-    static final int START_TABLE_VALUE_COUNT = 4; // How many logic values (tile colors) should be there
-    static final int MIN_PATTERN_SIZE = 4; // Pattern has to be at least this size to be scored
-    static final Set<ReplacementSource> replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));
+    final int START_TABLE_SIZE_X_BITS = 3; // How to split bits between x and y axis in table
+    final int START_TABLE_SIZE_Y_BITS = 3;
+    final int START_TABLE_VALUE_COUNT = 4; // How many logic values (tile colors) should be there
+    final int MIN_PATTERN_SIZE = 4; // Pattern has to be at least this size to be scored
+    final Set<ReplacementSource> replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));
+    
+    final int SCENE_HEIGHT = 480;
+    final int SCENE_WIDTH = 640;
+    
+    final int SIDEBAR_WIDTH = 160;
+    final int GAME_WIDTH = SCENE_HEIGHT - SIDEBAR_WIDTH;
 
-    static int WIDTH = 1 << START_TABLE_SIZE_X_BITS; // = 2^startTableSizeXBits
-    static int HEIGHT = 1 << START_TABLE_SIZE_Y_BITS;
+    final int WIDTH = 1 << START_TABLE_SIZE_X_BITS; // = 2^startTableSizeXBits
+    final int HEIGHT = 1 << START_TABLE_SIZE_Y_BITS;
 
-    public void startGame(){
+    final int SQUARE_SIZE = SCENE_HEIGHT/HEIGHT;
+
+    public void startGame() throws IOException{
         System.out.println("Starting game.");
         karnaugh = new KarnaughTable(START_TABLE_SIZE_X_BITS, START_TABLE_SIZE_Y_BITS, START_TABLE_VALUE_COUNT, MIN_PATTERN_SIZE, replacementSourcesSet);
+        // TOD O: rectangleList
+        
+
+        HBox wholeLayout = new HBox();
+        GridPane gameLayout = new GridPane();
+        VBox sidebarLayout = new VBox();
+        wholeLayout.getChildren().addAll(gameLayout, sidebarLayout);
+
+
+
+
+        wholeLayout.setMinWidth(SCENE_WIDTH);
+        wholeLayout.setMaxWidth(SCENE_HEIGHT);
+
+        gameLayout.setMinWidth(GAME_WIDTH);
+        gameLayout.minWidthProperty().bind(wholeLayout.heightProperty());
+
+
+        sidebarLayout.setPrefWidth(SIDEBAR_WIDTH);
+
+        gameLayout.setStyle("-fx-background-color: red;");
+        sidebarLayout.setStyle("-fx-background-color: blue;");
+
+
+        //wholeLayout.setHgrow(gameLayout, Priority.ALWAYS);
+
+        App.setLayoutAsScene(wholeLayout);
     }
 
 };

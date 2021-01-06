@@ -57,7 +57,7 @@ public class App extends Application {
 
     // Main data structures
     KarnaughTable karnaugh;                                             // Main karnaugh table, the core element of the game
-    private static Map<Integer, Color> colorDict = new HashMap<>();     // Tile value-to-color map
+    public static Map<Integer, Color> colorDict = new HashMap<>();     // Tile value-to-color map
     ArrayList<Coord> highlightedTiles = new ArrayList<>();
 
     // Score
@@ -65,11 +65,17 @@ public class App extends Application {
     int score = 0;
 
     // .fxml scene
-    private static Scene scene;
+    public static Scene scene;
+
+
+    static void setLayoutAsScene(Pane layout){ // Every pane/layout derives from Pane
+        scene.setRoot(layout);
+    }
 
     static void setRoot(String fxml) throws IOException {
          scene.setRoot(loadFXML(fxml));
     }
+
 
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));

@@ -8,6 +8,7 @@ public class MenuController {
     @FXML
     private void startClicked() throws IOException {
         Game game = new Game();
+        
         game.startGame();
     }
     
