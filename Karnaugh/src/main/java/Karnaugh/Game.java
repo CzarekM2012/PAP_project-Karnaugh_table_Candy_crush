@@ -83,10 +83,31 @@ public class Game{
 
 
         // Filling the layout with squares
+        String id;
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 Button btn = new Button();
-                btn.setId("rectangle");
+                id = "rectangle";
+
+                if((x+1)%4 == 0 && x!=WIDTH - 1){
+                    id += "_right";
+                }
+
+                else if((x+1)%4 == 1 && x!= 0){
+                    id += "_left";
+                }
+
+                
+                if((y+1)%4 == 0 && y!=HEIGHT - 1){
+                    id += "_bottom";
+                }
+
+                else if((y+1)%4 == 1 && y!=0){
+                    id += "_top";
+                }
+                
+
+                btn.setId(id);
                 btn.setPrefHeight(480/HEIGHT);
                 btn.setPrefWidth(480/WIDTH);
                 btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(WIDTH));
