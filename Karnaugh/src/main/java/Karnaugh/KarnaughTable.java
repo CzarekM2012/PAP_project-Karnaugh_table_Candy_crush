@@ -377,6 +377,57 @@ public class KarnaughTable {
      * Requires removing redundant coords before clearing tiles. */
     public ArrayList<ArrayList<Coord>> getPatternsContaining(Coord choosenFieldCoord)
     {
+        ArrayList<Coord> wildTiles = new ArrayList<Coord>();
+        for(int i=0; i<xSize; i++)
+        {
+            for(int j=0; j<ySize; j++)
+            {
+                if(board[i][j].equals(wildField))
+                {
+                    wildTiles.add(new Coord(i, j));
+                }
+            }
+        }
+        ArrayList<ArrayList<Coord>> patterns = new ArrayList<ArrayList<Coord>>();
+        if(wildTiles.size()>0)
+        {
+            if(board[choosenFieldCoord.x][choosenFieldCoord.y].equals(wildField))
+            {
+                for(int i=0; i<this.fieldValuesNumber; i++)
+                {
+                    for(Coord wildTileCoord : wildTiles)
+                    {
+                        board[wildTileCoord.x][wildTileCoord.y].value = i;
+                    }
+                    patterns.addAll(getPatternsContainingWithValue(i, choosenFieldCoord));
+                }
+            }
+            else
+            {
+                int choosenFieldValue = board[choosenFieldCoord.x][choosenFieldCoord.y].value;
+                for(Coord wildTileCoord : wildTiles)
+                {
+                    board[wildTileCoord.x][wildTileCoord.y].value = choosenFieldValue;
+                }
+                patterns.addAll(getPatternsContainingWithValue(choosenFieldValue, choosenFieldCoord));
+            }
+            for(Coord wildTileCoord : wildTiles)
+            {
+                board[wildTileCoord.x][wildTileCoord.y].value = wildField.value;
+            }
+        }
+        else
+        {
+            int choosenFieldValue = board[choosenFieldCoord.x][choosenFieldCoord.y].value;
+            patterns.addAll(getPatternsContainingWithValue(choosenFieldValue, choosenFieldCoord));
+        }
+        filterOutUnnecesaryPatterns(patterns);
+        return patterns;
+    }
+
+    /** Finds all tile patterns that contain tile at coord with all tiles having value equal "patternValue". */
+    private ArrayList<ArrayList<Coord>> getPatternsContainingWithValue(int patternValue, Coord choosenFieldCoord)
+    {
         Coord greyChoosenFieldCoord = new Coord(indexToGrey[choosenFieldCoord.x], indexToGrey[choosenFieldCoord.y]);
         ArrayList<Coord> patternExpansion = new ArrayList<Coord>();
         Coord greyCodeDifference = new Coord();
@@ -387,14 +438,13 @@ public class KarnaughTable {
         for(int i=0; i < compatibleNeighboursNumber; i++)
         {
             ArrayList<Coord> expander = patterns.get(i);
+            Coord expandingNeighbourCoord = expander.get(1);
             for(int j=i+1; j < patterns.size(); j++)
             {
                 ArrayList<Coord> expanded = patterns.get(j);
-                if(!expanded.contains(expander.get(1)))
+                if(!expanded.contains(expandingNeighbourCoord))
                 {
                     boolean compatiblePatterns = true;
-                    Coord expandingTileCoord = expander.get(1);
-                    int expandedPatternValue = board[expanded.get(1).x][expanded.get(1).y].value;
                     /*
                      * ^ - XOR operator:
                      * True ^ True -> False
@@ -402,8 +452,8 @@ public class KarnaughTable {
                      * False ^ True -> True
                      * False ^ False -> False
                      */
-                    greyCodeDifference.set(greyChoosenFieldCoord.x ^ indexToGrey[expandingTileCoord.x], 
-                                           greyChoosenFieldCoord.y ^ indexToGrey[expandingTileCoord.y]);
+                    greyCodeDifference.set(greyChoosenFieldCoord.x ^ indexToGrey[expandingNeighbourCoord.x], 
+                                           greyChoosenFieldCoord.y ^ indexToGrey[expandingNeighbourCoord.y]);
                     int k=0;
                     while(compatiblePatterns && k < expanded.size())
                     {
@@ -413,7 +463,7 @@ public class KarnaughTable {
                            "choosenFieldCoord" and "expandingTile"*/
                         inspected.set(greyToIndex[indexToGrey[inspected.x] ^ greyCodeDifference.x],
                                       greyToIndex[indexToGrey[inspected.y] ^ greyCodeDifference.y]);
-                        if(board[inspected.x][inspected.y].value != expandedPatternValue && !board[inspected.x][inspected.y].equals(wildField))
+                        if(board[inspected.x][inspected.y].value != patternValue)
                         {
                             compatiblePatterns = false;
                         }
@@ -431,7 +481,6 @@ public class KarnaughTable {
                 }
             }
         }
-        filterOutUnnecesaryPatterns(patterns);
         return patterns;
     }
 
