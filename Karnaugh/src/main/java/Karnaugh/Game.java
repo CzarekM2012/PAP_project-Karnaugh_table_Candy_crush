@@ -55,6 +55,8 @@ public class Game{
         System.out.println("Starting game.");
         karnaugh = new KarnaughTable(START_TABLE_SIZE_X_BITS, START_TABLE_SIZE_Y_BITS, START_TABLE_VALUE_COUNT, MIN_PATTERN_SIZE, replacementSourcesSet);
         
+
+        // array containing all buttons in the playable field
         Button[] rectangles = new Button[WIDTH * HEIGHT];
         
 
@@ -72,8 +74,8 @@ public class Game{
 
         sidebarLayout.setPrefWidth(SIDEBAR_WIDTH);
 
-        gameLayout.setStyle("-fx-background-color: red;");
-        sidebarLayout.setStyle("-fx-background-color: blue;");
+        gameLayout.setStyle("-fx-background-color: red;"); 
+        sidebarLayout.setStyle("-fx-background-color: blue;"); //used for testing resizing
 
 
 
@@ -81,14 +83,20 @@ public class Game{
         wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
         wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
 
+        
 
-        // Filling the layout with squares
+
+
+        // Filling the layout with buttons
         String id;
         for (int x = 0; x < WIDTH; x++) {
+
+            
             for (int y = 0; y < HEIGHT; y++) {
                 Button btn = new Button();
                 id = "rectangle";
 
+                // the 4 following if statements are used to implement "mirrors" by coloring borders
                 if((x+1)%4 == 0 && x!=WIDTH - 1){
                     id += "_right";
                 }
@@ -108,16 +116,20 @@ public class Game{
                 
 
                 btn.setId(id);
-                btn.setPrefHeight(480/HEIGHT);
-                btn.setPrefWidth(480/WIDTH);
+
+                // sets base size of the buttons
+                btn.setPrefHeight(480/HEIGHT+1);
+                btn.setPrefWidth(480/WIDTH+1);
+
+                // makes buttons resize with window, and thus gameLayout, resizing
                 btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(WIDTH));
                 btn.prefWidthProperty().bind(gameLayout.heightProperty().divide(HEIGHT));
 
+                // changes the cursor when hovering over the button
                 btn.setCursor(Cursor.HAND);
-                //btn.setStroke(Color.BLACK);
-
+                
                 rectangles[y * WIDTH + x] = btn;
-                gameLayout.add(btn, x, y);
+                gameLayout.add(btn, x+1, y +1);
 
                 // Rectangle input handling
                 btn.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -126,6 +138,8 @@ public class Game{
 
                     }
                 });
+
+                
             }
         }
         
