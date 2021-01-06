@@ -43,12 +43,8 @@ public class Game{
     final int MIN_PATTERN_SIZE = 4; // Pattern has to be at least this size to be scored
     final Set<ReplacementSource> replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));
     
-    // Initializes as a 4:3 aspect ratio 640x480 window
-    final int SCENE_HEIGHT = 480;
-    final int SCENE_WIDTH = 640;
-    
-    final int SIDEBAR_WIDTH = 160; // Width of the sidebar containing main menu button, score, etc.
-    final int GAME_WIDTH = SCENE_HEIGHT - SIDEBAR_WIDTH; // Defaults game pane to cover the rest of the scene at initialization (root change)
+
+    final int SIDEBAR_WIDTH = 160; // Maximal width of the sidebar containing main menu button, score, etc.
 
     final int WIDTH = 1 << START_TABLE_SIZE_X_BITS; // = 2^startTableSizeXBits
     final int HEIGHT = 1 << START_TABLE_SIZE_Y_BITS;
@@ -73,9 +69,10 @@ public class Game{
 
         wholeLayout.getChildren().addAll(leftPad, gameLayout, sidebarLayout, rightPad); // Adds all "sublayouts" to the "main layout" in order
 
-        wholeLayout.setPrefWidth(SCENE_HEIGHT);
 
         gameLayout.setId("game");
+        sidebarLayout.setId("sidebar");
+        
         // thanks to these scaling works. I think
         gameLayout.minWidthProperty().bind(App.scene.heightProperty());
         leftPad.prefWidthProperty().bind(rightPad.prefWidthProperty());
@@ -83,6 +80,7 @@ public class Game{
         wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
         wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
 
+        sidebarLayout.setMinWidth(SIDEBAR_WIDTH);
         sidebarLayout.setPrefWidth(SIDEBAR_WIDTH);
 
 
@@ -90,8 +88,8 @@ public class Game{
 
 
         // used for testing resizing
-        gameLayout.setStyle("-fx-background-color: red;"); 
-        sidebarLayout.setStyle("-fx-background-color: blue;");
+        // gameLayout.setStyle("-fx-background-color: red;"); 
+        // sidebarLayout.setStyle("-fx-background-color: blue;");
         
 
 
@@ -99,7 +97,7 @@ public class Game{
         // Filling the layout with buttons
         
         String id; // Later used to apply fx:id to buttons
-        for (int x = 0; x < WIDTH; x++) {
+        for (int x = 0; x < WIDTH; x++){
 
             
             for (int y = 0; y < HEIGHT; y++) {
