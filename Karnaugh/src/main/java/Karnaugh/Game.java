@@ -32,7 +32,7 @@ import javafx.fxml.FXMLLoader;
 import java.io.IOException;
 
 public class Game{
-    KarnaughTable karnaugh;
+    KarnaughTable karnaugh; // represents logic beneath the game
 
     final int START_TABLE_SIZE_X_BITS = 3; // How to split bits between x and y axis in table
     final int START_TABLE_SIZE_Y_BITS = 3;
@@ -40,16 +40,15 @@ public class Game{
     final int MIN_PATTERN_SIZE = 4; // Pattern has to be at least this size to be scored
     final Set<ReplacementSource> replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));
     
+    // Initializes as a 4:3 aspect ratio 640x480 window
     final int SCENE_HEIGHT = 480;
     final int SCENE_WIDTH = 640;
     
-    final int SIDEBAR_WIDTH = 160;
-    final int GAME_WIDTH = SCENE_HEIGHT - SIDEBAR_WIDTH;
+    final int SIDEBAR_WIDTH = 160; // Width of the sidebar containing main menu button, score, etc.
+    final int GAME_WIDTH = SCENE_HEIGHT - SIDEBAR_WIDTH; // Defaults game pane to cover the rest of the scene at initialization (root change)
 
     final int WIDTH = 1 << START_TABLE_SIZE_X_BITS; // = 2^startTableSizeXBits
     final int HEIGHT = 1 << START_TABLE_SIZE_Y_BITS;
-
-    final int SQUARE_SIZE = SCENE_HEIGHT/HEIGHT;
 
     public void startGame() throws IOException{
         System.out.println("Starting game.");
@@ -60,35 +59,39 @@ public class Game{
         Button[] rectangles = new Button[WIDTH * HEIGHT];
         
 
-        HBox wholeLayout = new HBox();
+        HBox wholeLayout = new HBox(); // "topmost" layout; later used as the new root
+
+        // Put there to make padding easier; a more clever solution almost certainly exists, but searching the net for answers started giving me flashbacks after doing it thousands of times
         Pane leftPad = new Pane();
         Pane rightPad = new Pane();
-        GridPane gameLayout = new GridPane();
-        VBox sidebarLayout = new VBox();
-        wholeLayout.getChildren().addAll(leftPad, gameLayout, sidebarLayout, rightPad);
+        
+        GridPane gameLayout = new GridPane(); // rectangle containing more rectangles (buttons actually), game happens there
+        VBox sidebarLayout = new VBox(); // main menu button, score, etc.
+
+        wholeLayout.getChildren().addAll(leftPad, gameLayout, sidebarLayout, rightPad); // Adds all "sublayouts" to the "main layout" in order
 
         wholeLayout.setPrefWidth(SCENE_HEIGHT);
+
+        // thanks to these scaling works. I think
         gameLayout.minWidthProperty().bind(App.scene.heightProperty());
         leftPad.prefWidthProperty().bind(rightPad.prefWidthProperty());
-        
-
-        sidebarLayout.setPrefWidth(SIDEBAR_WIDTH);
-
-        gameLayout.setStyle("-fx-background-color: red;"); 
-        sidebarLayout.setStyle("-fx-background-color: blue;"); //used for testing resizing
-
-
-
         
         wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
         wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
 
+        sidebarLayout.setPrefWidth(SIDEBAR_WIDTH);
+
+
+        // used for testing resizing
+        gameLayout.setStyle("-fx-background-color: red;"); 
+        sidebarLayout.setStyle("-fx-background-color: blue;");
         
 
 
 
         // Filling the layout with buttons
-        String id;
+        
+        String id; // Later used to apply fx:id to buttons
         for (int x = 0; x < WIDTH; x++) {
 
             
@@ -117,9 +120,9 @@ public class Game{
 
                 btn.setId(id);
 
-                // sets base size of the buttons
-                btn.setPrefHeight(480/HEIGHT+1);
-                btn.setPrefWidth(480/WIDTH+1);
+                // sets base size of the buttons, actually useless
+                btn.setPrefHeight(480/HEIGHT);
+                btn.setPrefWidth(480/WIDTH);
 
                 // makes buttons resize with window, and thus gameLayout, resizing
                 btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(WIDTH));
@@ -128,8 +131,9 @@ public class Game{
                 // changes the cursor when hovering over the button
                 btn.setCursor(Cursor.HAND);
                 
+                // adds reference to the button to the array; and then adds it to the layout at correct positions
                 rectangles[y * WIDTH + x] = btn;
-                gameLayout.add(btn, x+1, y +1);
+                gameLayout.add(btn, x+1, y +1); // "+1" as I'll soon add labels at x = 0 and y = 0;
 
                 // Rectangle input handling
                 btn.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -145,19 +149,10 @@ public class Game{
         
         
 
-
-
-
-
-
-
-
-
-
-
-
-
+        // applies .css styling to the scene
         App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
+
+        // changes root of the scene to wholeLayout - the "topmost" parent layer of the game "scene"
         App.setLayoutAsScene(wholeLayout);
     }
 
