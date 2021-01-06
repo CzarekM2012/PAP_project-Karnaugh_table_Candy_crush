@@ -2,15 +2,16 @@
     -fx-background-image: url('./images/padding.jpg');
     -fx-background-size: cover;
  }
+#main_menu_button{
+    -fx-background-color: rgb(150, 0, 0);
+    -fx-text-fill: white;
+    -fx-font-size: 12pt;
+}
 
-
-
-
-
-
-
-
-
+#main_menu_button:hover{
+    -fx-background-color: red;
+    -fx-cursor: hand;
+}
 
 
  /* I'm sorry (used for "mirrors") */

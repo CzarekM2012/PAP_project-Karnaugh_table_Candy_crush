@@ -3,6 +3,7 @@ package karnaugh;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
+
 import java.util.HashSet;
 import java.util.Arrays;
 
@@ -82,6 +83,9 @@ public class Game{
         sidebarLayout.setPrefWidth(SIDEBAR_WIDTH);
 
 
+        sidebarLayout.setAlignment(Pos.BASELINE_CENTER);
+
+
         // used for testing resizing
         gameLayout.setStyle("-fx-background-color: red;"); 
         sidebarLayout.setStyle("-fx-background-color: blue;");
@@ -147,7 +151,22 @@ public class Game{
             }
         }
         
+
+        Button mainMenuButton = new Button("Main Menu");
+        mainMenuButton.setId("main_menu_button");
         
+        mainMenuButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                try{
+                App.setRoot("menu");
+                return;
+                }   catch (Exception e){;};
+            }
+        });
+        
+        sidebarLayout.getChildren().add(mainMenuButton);
+
 
         // applies .css styling to the scene
         App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
