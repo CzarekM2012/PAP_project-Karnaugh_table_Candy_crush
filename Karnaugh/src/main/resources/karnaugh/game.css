@@ -1,7 +1,8 @@
 .root{
     -fx-background-image: url('./images/padding.jpg');
     -fx-background-size: cover;
- }
+}
+
 #main_menu_button{
     -fx-background-color: rgb(150, 0, 0);
     -fx-text-fill: white;
@@ -14,24 +15,24 @@
 }
 
 
- /* I'm sorry (used for "mirrors") */
-
  #game .button{
     -fx-background-radius: 0,0,0,0;
     -fx-background-color: white;
 }
+
 
 #sidebar{
     -fx-border-color: cyan;
     -fx-border-width: 1;
     -fx-background-color: lightgrey;
 }
-    
+
+/* I'm sorry (used for "mirrors") */
  #rectangle{
     -fx-border-color:black;
     -fx-border-width: 1 1 1 1;
 }
- 
+
 #rectangle_right{
     -fx-border-color:black red black black;
     -fx-border-width: 1 1 1 1;
