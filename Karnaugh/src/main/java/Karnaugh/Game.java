@@ -75,6 +75,7 @@ public class Game{
 
         wholeLayout.setPrefWidth(SCENE_HEIGHT);
 
+        gameLayout.setId("game");
         // thanks to these scaling works. I think
         gameLayout.minWidthProperty().bind(App.scene.heightProperty());
         leftPad.prefWidthProperty().bind(rightPad.prefWidthProperty());
@@ -145,7 +146,10 @@ public class Game{
                 btn.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-
+                        final int xOfRctg = (int) ((event.getSceneX())/ btn.getWidth()); // x coordinate of the rectangle
+                        final int yOfRctg = (int) ((event.getSceneY())/ btn.getHeight()); 
+            
+                        System.out.println("Button at (" + xOfRctg +", " + yOfRctg + ") clicked.");
                     }
                 });
 

@@ -16,57 +16,53 @@
 
  /* I'm sorry (used for "mirrors") */
 
- #rectangle{
+ #game .button{
     -fx-background-radius: 0,0,0,0;
+    -fx-background-color: white;
+}
+    
+ #rectangle{
     -fx-border-color:black;
     -fx-border-width: 1 1 1 1;
 }
  
 #rectangle_right{
-    -fx-background-radius: 0,0,0,0;
     -fx-border-color:black red black black;
     -fx-border-width: 1 1 1 1;
 } 
 
 #rectangle_left{
-    -fx-background-radius: 0,0,0,0;
     -fx-border-color:black black black red;
     -fx-border-width: 1 1 1 1;
 }
 
 #rectangle_top{
-    -fx-background-radius: 0,0,0,0;
     -fx-border-color:red black black black;
     -fx-border-width: 1 1 1 1;
 }
 
 #rectangle_bottom{
-    -fx-background-radius: 0,0,0,0;
     -fx-border-color:black black red black;
     -fx-border-width: 1 1 1 1;
 }
 
 
 #rectangle_right_bottom{
-    -fx-background-radius: 0,0,0,0;
     -fx-border-color:black red red black;
     -fx-border-width: 1 1 1 1;
 }
 
 #rectangle_right_top{
-    -fx-background-radius: 0,0,0,0;
     -fx-border-color:red red black black;
     -fx-border-width: 1 1 1 1;
 }
 
 #rectangle_left_bottom{
-    -fx-background-radius: 0,0,0,0;
     -fx-border-color:black black red red;
     -fx-border-width: 1 1 1 1;
 }
 
 #rectangle_left_top{
-    -fx-background-radius: 0,0,0,0;
     -fx-border-color:red black black red;
     -fx-border-width: 1 1 1 1;
 }
