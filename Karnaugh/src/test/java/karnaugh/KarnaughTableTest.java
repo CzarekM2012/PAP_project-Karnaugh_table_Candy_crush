@@ -625,6 +625,74 @@ public class KarnaughTableTest
     }
 
     /*
+        0 1 2 3 4 5 6 7
+    0   1 1 1 0 0 0 0 1 G:000
+    1   1 1 1 1 2 2 1 0 G:001
+    2   1 1 1 1 2 1 1 0 G:011
+    3   0 2 2 0 0 1 0 0 G:010
+    4   0 w 0 2 0 0 w 0 G:110
+    5   0 0 1 2 0 0 0 0 G:111
+    6   0 2 2 2 2 1 0 0 G:101
+    7   1 1 2 0 0 1 1 1 G:100
+    */
+    @Test
+    public void testGetPatternsContainingMultipleWithMultipleWildTilesWildTileAsCore()
+    {
+        KarnaughTable test = new KarnaughTable(3, 3, 10, 2, 0f, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
+        Field zero = new Field(0, ReplacementSource.Top), one = new Field(1, ReplacementSource.Top), two = new Field(2, ReplacementSource.Top), wild = KarnaughTable.wildField;
+        test.clear();
+        Field newBoard[][] = {  {one,  one,  one,  zero, zero, zero, zero, one},//leftmost vertical row
+                                {one,  one,  one,  two,  wild, zero, two,  one},
+                                {one,  one,  one,  two,  zero, one,  two,  two},
+                                {zero, one,  one,  zero, two,  two,  two,  zero},
+                                {zero, two,  two,  zero, zero, zero, two,  zero},
+                                {zero, two,  one,  one,  zero, zero, one,  one},
+                                {zero, one,  one,  zero, wild, zero, zero, one},
+                                {one,  zero, zero, zero, zero, zero, zero, one}};
+        test.set(new Coord(0, 0), newBoard);
+        ArrayList<ArrayList<Coord>> patterns = test.getPatternsContaining(new Coord(1, 4));
+        ArrayList<ArrayList<Coord>> correct = new ArrayList<ArrayList<Coord>>();
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(0, 4), new Coord(0, 5), new Coord(1, 4), new Coord(1, 5),
+                         new Coord(6, 4), new Coord(6, 5), new Coord(7, 4), new Coord(7, 5)})));
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(1, 4), new Coord(2, 4), new Coord(5, 4), new Coord(6, 4)})));
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(1, 4), new Coord(6, 4), new Coord(1, 7), new Coord(6, 7)})));
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(1, 3), new Coord(1, 4)})));
+        assertTrue(coordArrayListsArrayListEquals(correct, patterns));
+    }
+
+    @Test
+    public void testGetPatternsContainingMultipleWithMultipleWildTilesAsParts()
+    {
+        KarnaughTable test = new KarnaughTable(3, 3, 10, 2, 0f, new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top})));
+        Field zero = new Field(0, ReplacementSource.Top), one = new Field(1, ReplacementSource.Top), two = new Field(2, ReplacementSource.Top), wild = KarnaughTable.wildField;
+        test.clear();
+        Field newBoard[][] = {  {one,  one,  one,  zero, zero, zero, zero, one},//leftmost vertical row
+                                {one,  one,  one,  two,  wild, zero, two,  one},
+                                {one,  one,  one,  two,  zero, one,  two,  two},
+                                {zero, one,  one,  zero, two,  two,  two,  zero},
+                                {zero, two,  two,  zero, zero, zero, two,  zero},
+                                {zero, two,  one,  one,  zero, zero, one,  one},
+                                {zero, one,  one,  zero, wild, zero, zero, one},
+                                {one,  zero, zero, zero, zero, zero, zero, one}};
+        test.set(new Coord(0, 0), newBoard);
+        ArrayList<ArrayList<Coord>> patterns = test.getPatternsContaining(new Coord(6, 5));
+        ArrayList<ArrayList<Coord>> correct = new ArrayList<ArrayList<Coord>>();
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(0, 4), new Coord(0, 5), new Coord(1, 4), new Coord(1, 5),
+                         new Coord(6, 4), new Coord(6, 5), new Coord(7, 4), new Coord(7, 5)})));
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(4, 4), new Coord(5, 4), new Coord(6, 4), new Coord(7, 4),
+                         new Coord(4, 5), new Coord(5, 5), new Coord(6, 5), new Coord(7, 5)})));
+        correct.add(new ArrayList<Coord>(Arrays.asList(
+            new Coord[] {new Coord(6, 5), new Coord(7, 5), new Coord(6, 6), new Coord(7, 6)})));
+        assertTrue(coordArrayListsArrayListEquals(correct, patterns));
+    }
+
+    /*
     10
     01
     */
