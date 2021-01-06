@@ -104,6 +104,10 @@ public class App extends Application {
     public void start(Stage primaryStage) throws IOException {
         // Preparing window
         primaryStage.setTitle("Karnaugh");
+        primaryStage.setMinWidth(640);
+        primaryStage.setMinHeight(480);
+
+        primaryStage.minWidthProperty().bind(primaryStage.heightProperty().multiply(4/3));
 
         scene = new Scene(loadFXML("menu"), 640, 480);
         primaryStage.setScene(scene);  

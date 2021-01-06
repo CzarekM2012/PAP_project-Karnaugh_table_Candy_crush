@@ -57,19 +57,20 @@ public class Game{
         
 
         HBox wholeLayout = new HBox();
+        Pane leftPad = new Pane();
+        Pane rightPad = new Pane();
         GridPane gameLayout = new GridPane();
         VBox sidebarLayout = new VBox();
-        wholeLayout.getChildren().addAll(gameLayout, sidebarLayout);
+        wholeLayout.getChildren().addAll(leftPad, gameLayout, sidebarLayout, rightPad);
 
 
 
 
-        wholeLayout.setMinWidth(SCENE_WIDTH);
-        wholeLayout.setMaxWidth(SCENE_HEIGHT);
+        wholeLayout.setPrefWidth(SCENE_HEIGHT);
+        gameLayout.minWidthProperty().bind(App.scene.heightProperty());
 
-        gameLayout.setMinWidth(GAME_WIDTH);
-        gameLayout.minWidthProperty().bind(wholeLayout.heightProperty());
-
+        leftPad.prefWidthProperty().bind(rightPad.prefWidthProperty());
+        
 
         sidebarLayout.setPrefWidth(SIDEBAR_WIDTH);
 
@@ -77,7 +78,8 @@ public class Game{
         sidebarLayout.setStyle("-fx-background-color: blue;");
 
 
-        //wholeLayout.setHgrow(gameLayout, Priority.ALWAYS);
+        wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
+        wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
 
         App.setLayoutAsScene(wholeLayout);
     }
