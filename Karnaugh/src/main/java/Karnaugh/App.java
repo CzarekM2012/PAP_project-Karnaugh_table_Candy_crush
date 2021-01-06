@@ -71,6 +71,9 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        colorDict.put(-3, "000000");
+        colorDict.put(-2, "404040");
+        colorDict.put(-1, "ffffff");
         colorDict.put(0, "577590");
         colorDict.put(1, "90be6d");
         colorDict.put(2, "f8961e");
