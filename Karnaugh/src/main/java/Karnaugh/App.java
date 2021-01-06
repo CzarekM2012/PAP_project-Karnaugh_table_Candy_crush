@@ -93,19 +93,25 @@ public class App extends Application {
     // Returns a reference to a rectangle on the board
     public Rectangle getRectangleAt(int xRctg, int yRctg) {return rectangles[yRctg * WIDTH + xRctg];}
 
+
     @Override
     public void start(Stage primaryStage) throws IOException {
         // Preparing window
         primaryStage.setTitle("Karnaugh");
 
         scene = new Scene(loadFXML("menu"), 640, 480);
+        primaryStage.setScene(scene);  
         
-
-        primaryStage.setScene(scene);   
-      
+    /*  Reference on how to add properties to nodes by fxid
+        scene.lookup("#startButton").setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                System.out.print("AAAAAAAAAAAAAAAAAAA");
+            }
+        });
+    */
         primaryStage.show();
     }
-    
     
     static public void startGame(){
 

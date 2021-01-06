@@ -2,32 +2,16 @@
 
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane stylesheets="@game.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="karnaugh.GameController">
-    <top>
-    </top>
-                  
-    <left>
-    </left>
-            
-    <center>
-        <GridPane fx:id="gamePane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
-            <children>
+<HBox stylesheets="@game.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="karnaugh.GameController">
+    <GridPane fx:id = "grid">
+    </GridPane>
+
+    <VBox>
+    </VBox>
     
-            </children>
-        </GridPane>
-    </center>
-                 
-    <right>
-        <VBox fx:id="scorePane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"> 
-            <children>
-            
-            </children>
-        </VBox>
-    </right>
-</BorderPane>
+</HBox>
