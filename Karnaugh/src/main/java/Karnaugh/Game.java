@@ -19,6 +19,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -53,7 +54,8 @@ public class Game{
     public void startGame() throws IOException{
         System.out.println("Starting game.");
         karnaugh = new KarnaughTable(START_TABLE_SIZE_X_BITS, START_TABLE_SIZE_Y_BITS, START_TABLE_VALUE_COUNT, MIN_PATTERN_SIZE, replacementSourcesSet);
-        // TOD O: rectangleList
+        
+        Button[] rectangles = new Button[WIDTH * HEIGHT];
         
 
         HBox wholeLayout = new HBox();
@@ -62,7 +64,7 @@ public class Game{
         GridPane gameLayout = new GridPane();
         VBox sidebarLayout = new VBox();
         wholeLayout.getChildren().addAll(leftPad, gameLayout, sidebarLayout, rightPad);
-        
+
         wholeLayout.setPrefWidth(SCENE_HEIGHT);
         gameLayout.minWidthProperty().bind(App.scene.heightProperty());
         leftPad.prefWidthProperty().bind(rightPad.prefWidthProperty());
@@ -74,8 +76,50 @@ public class Game{
         sidebarLayout.setStyle("-fx-background-color: blue;");
 
 
+
+        
         wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
         wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
+
+
+        // Filling the layout with squares
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                Button btn = new Button();
+                btn.setPrefHeight(480/HEIGHT);
+                btn.setPrefWidth(480/WIDTH);
+                btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(WIDTH));
+                btn.prefWidthProperty().bind(gameLayout.heightProperty().divide(HEIGHT));
+
+                btn.setCursor(Cursor.HAND);
+                //btn.setStroke(Color.BLACK);
+
+                rectangles[y * WIDTH + x] = btn;
+                gameLayout.add(btn, x, y);
+
+                // Rectangle input handling
+                btn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+
+                    }
+                });
+            }
+        }
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
 
         App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
         App.setLayoutAsScene(wholeLayout);
