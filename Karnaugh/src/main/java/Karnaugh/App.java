@@ -1,12 +1,11 @@
 package karnaugh;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.Arrays;
-
 import java.util.HashMap;
+import java.util.HashSet;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -32,17 +31,7 @@ import java.io.IOException;
 
 public class App extends Application {
 
-    // Karnaugh table setup values
-    static final int START_TABLE_SIZE_X_BITS = 3; // How to split bits between x and y axis in table
-    static final int START_TABLE_SIZE_Y_BITS = 3;
-    static final int START_TABLE_VALUE_COUNT = 4; // How many logic values (tile colors) should be there
-    static final int MIN_PATTERN_SIZE = 4; // Pattern has to be at least this size to be scored
-    static final float wildFieldChance = 0.05f;
-    static final Set<ReplacementSource> replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));//TODO:miało być na zewnątrz, więc jest tutaj
-
     // Default UI element sizes and offsets
-    static int WIDTH = 1 << START_TABLE_SIZE_X_BITS; // = 2^startTableSizeXBits
-    static int HEIGHT = 1 << START_TABLE_SIZE_Y_BITS;
     static int SQUARE_SIZE = 100;
     static int MIRROR_SIZE = 5;
     static int MIRROR_FREQUENCY = 4; // mirrors appear every 4 squares, but I've put it as a variable in case I'm wrong
@@ -50,14 +39,12 @@ public class App extends Application {
     static int BASE_X_OFFSET = 75;
     static int BASE_Y_OFFSET = 75;
     static int BOTTOM_PAD = 75;
-    final static int ANIMATION_DELAY = 50;
 
     // Input handling
     static Coord lastSelectedTile = null;
     static boolean lockClicking = false;
 
     // Main data structures
-    KarnaughTable karnaugh;                                             // Main karnaugh table, the core element of the game
     public static Map<Integer, String> colorDict = new HashMap<>();     // Tile value-to-color map
     ArrayList<Coord> highlightedTiles = new ArrayList<>();
 
@@ -84,6 +71,9 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        colorDict.put(-3, "000000");
+        colorDict.put(-2, "404040");
+        colorDict.put(-1, "ffffff");
         colorDict.put(0, "577590");
         colorDict.put(1, "90be6d");
         colorDict.put(2, "f8961e");
@@ -92,13 +82,40 @@ public class App extends Application {
         colorDict.put(5, "f9c74f");
         colorDict.put(6, "f3722c");
         launch(args);
+
+        // Load config
+
+        // Properties prop = new Properties();
+        // InputStream input = null;
+
+        // try {
+
+        //     input = new FileInputStream("config.properties");
+
+        //     // load a properties file
+        //     prop.load(input);
+
+        //     // get the property value and print it out
+        //     System.out.println(prop.setProperty("conf_1", "1"));
+
+        // } catch (IOException ex) {
+        //     ex.printStackTrace();
+        // } finally {
+        //     if (input != null) {
+        //         try {
+        //             input.close();
+        //         } catch (IOException e) {
+        //             e.printStackTrace();
+        //         }
+        //     }
+        // }
     }
 
     // Table fields' graphical representation
-    public Rectangle[] rectangles = new Rectangle[WIDTH * HEIGHT];
+    public Rectangle[] rectangles;
 
     // Returns a reference to a rectangle on the board
-    public Rectangle getRectangleAt(int xRctg, int yRctg) {return rectangles[yRctg * WIDTH + xRctg];}
+    public Rectangle getRectangleAt(int xRctg, int yRctg) {return rectangles[yRctg * tableWidth + xRctg];}
 
 
     @Override

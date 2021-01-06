@@ -27,7 +27,7 @@ public class KarnaughTable {
             
             this.fieldValuesNumber = fieldValuesNumber;
             this.minPatternTileCount = minPatternTileCount;
-            this.wildTileChance = (int)wildTileChance * 1000;
+            this.wildTileChance = (int)(wildTileChance * 1000);
             this.replacementSourcesSet = replacementSourcesSet;
             
             int longerEdge = xSize>ySize?xSize:ySize;

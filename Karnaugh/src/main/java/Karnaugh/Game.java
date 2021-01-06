@@ -30,51 +30,57 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.File;
+import java.util.Properties;
 import java.io.IOException;
+import java.util.Scanner;
 
 
 public class Game{
-    final int START_TABLE_SIZE_X_BITS = 3; // How to split bits between x and y axis in table
-    final int START_TABLE_SIZE_Y_BITS = 3;
-    final int START_TABLE_VALUE_COUNT = 4; // How many logic values (tile colors) should be there
-    final int MIN_PATTERN_SIZE = 4; // Pattern has to be at least this size to be scored
+
+    // Level-related values
+    String levelName;
+    int tableBitSizeX;                      // How to split bits between x and y axis in table
+    int tableBitSizeY;
+    int tableWidth = 1 << tableBitSizeX;    // = 2^startTableSizeXBits
+    int tableHeight = 1 << tableBitSizeY;
+    int tableValueCount;                    // How many logic values (tile colors) should be there
+    int gravityType;                        // How Gravity should be handled
+    int minPatternSize;                     // Pattern has to be at least this size to be scored
+    float wildFieldChance;
+    Set<ReplacementSource> replacementSourcesSet;
+
+    // Layout
     final int ANIMATION_DELAY = 50;
-    
-    final Set<ReplacementSource> replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));
-
-    
     final int SIDEBAR_WIDTH = 160; // Maximal width of the sidebar containing main menu button, score, etc.
-
-    final int WIDTH = 1 << START_TABLE_SIZE_X_BITS; // = 2^startTableSizeXBits
-    final int HEIGHT = 1 << START_TABLE_SIZE_Y_BITS;
-
-    int score;
-
 
     // Input handling
     static Coord lastSelectedTile = null;
     static boolean lockClicking = false;
 
+    // File I/O
+    String levelFolderPath = "config/levels";
 
-    KarnaughTable karnaugh; // represents logic beneath the game
-    public static Map<Integer, String> colorDict = App.colorDict;    
-
-    // array containing all buttons in the playable field
-    Button[] rectangles = new Button[WIDTH * HEIGHT];
-
-    ArrayList<Coord> highlightedTiles = new ArrayList<>();
+    // Main data structures
+    KarnaughTable karnaugh;                                             // represents logic beneath the game
+    public static Map<Integer, String> colorDict = App.colorDict;       // stores tile colors
+    Button[] rectangles = new Button[tableWidth * tableHeight];         // array containing all buttons in the playable field
+    ArrayList<Coord> highlightedTiles = new ArrayList<>();              // keeps track of which tiles are highlighted
+    int score;
+    
     // Returns a reference to a rectangle on the board
-    public Button getRectangleAt(int xRctg, int yRctg) {return rectangles[yRctg * WIDTH + xRctg];}
-
-
+    public Button getRectangleAt(int xRctg, int yRctg) {return rectangles[yRctg * tableWidth + xRctg];}
 
     public void startGame() throws IOException{
+
+        loadLevel(0);
+
         score = 0;
         System.out.println("Starting game.");
-        karnaugh = new KarnaughTable(START_TABLE_SIZE_X_BITS, START_TABLE_SIZE_Y_BITS, START_TABLE_VALUE_COUNT, MIN_PATTERN_SIZE, replacementSourcesSet);
-        
-
-        
+        karnaugh = new KarnaughTable(tableBitSizeX, tableBitSizeY, tableValueCount, minPatternSize, wildFieldChance, replacementSourcesSet);
 
         HBox wholeLayout = new HBox(); // "topmost" layout; later used as the new root
 
@@ -115,15 +121,15 @@ public class Game{
         // Filling the layout with buttons
         
         String id; // Later used to apply fx:id to buttons
-        for (int x = 0; x < WIDTH; x++){
+        for (int x = 0; x < tableWidth; x++){
 
             
-            for (int y = 0; y < HEIGHT; y++) {
+            for (int y = 0; y < tableHeight; y++) {
                 Button btn = new Button();
                 id = "rectangle";
 
                 // the 4 following if statements are used to implement "mirrors" by coloring borders
-                if((x+1)%4 == 0 && x!=WIDTH - 1){
+                if((x+1)%4 == 0 && x!=tableWidth - 1){
                     id += "_right";
                 }
 
@@ -132,7 +138,7 @@ public class Game{
                 }
 
                 
-                if((y+1)%4 == 0 && y!=HEIGHT - 1){
+                if((y+1)%4 == 0 && y!=tableHeight - 1){
                     id += "_bottom";
                 }
 
@@ -144,18 +150,18 @@ public class Game{
                 btn.setId(id);
 
                 // sets base size of the buttons, actually useless
-                btn.setPrefHeight(480/HEIGHT);
-                btn.setPrefWidth(480/WIDTH);
+                btn.setPrefHeight(480/tableHeight);
+                btn.setPrefWidth(480/tableWidth);
 
                 // makes buttons resize with window, and thus gameLayout, resizing
-                btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(WIDTH));
-                btn.prefWidthProperty().bind(gameLayout.heightProperty().divide(HEIGHT));
+                btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(tableWidth));
+                btn.prefWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
 
                 // changes the cursor when hovering over the button
                 btn.setCursor(Cursor.HAND);
                 
                 // adds reference to the button to the array; and then adds it to the layout at correct positions
-                rectangles[y * WIDTH + x] = btn;
+                rectangles[y * tableWidth + x] = btn;
 
                 gameLayout.add(btn, x+1, y +1); // "+1" as I'll soon add labels at x = 0 and y = 0;
 
@@ -171,7 +177,7 @@ public class Game{
                         final int xOfRctg = (int) (((event.getSceneX()) - leftPad.getWidth())/ btn.getWidth()); // x coordinate of the rectangle
                         final int yOfRctg = (int) ((event.getSceneY())/ btn.getHeight()); 
             
-                        System.out.println("Button at (" + xOfRctg +", " + yOfRctg + ") clicked.");
+                        //System.out.println("Button at (" + xOfRctg +", " + yOfRctg + ") clicked.");
 						
                         // Game functions are started in a separate thread to keep the UI responsive
                         Task<Void> task = new Task<Void>() {
@@ -239,7 +245,6 @@ public class Game{
         Color color = Color.web("0x" + hexCode);
         color = color.desaturate();
         color = color.desaturate();
-        //TODO: check if works
         return color.toString().substring(2, 8);
     }
 
@@ -379,8 +384,6 @@ public class Game{
             sleep(ANIMATION_DELAY);
             removeHighlights();
 
-            System.out.println("TEST");
-
         } while(!tilesToDestroy.isEmpty());
 
         lockClicking = false;
@@ -404,5 +407,82 @@ public class Game{
         } catch(Exception e) {};
     }
 
+
+    // Loads level from file, resets game, creates and redraws the table
+    void loadLevel(int fileId) {
+        final File levelFolder = new File(levelFolderPath);
+        System.out.println(levelFolder.getAbsolutePath());
+
+        try {
+            loadLevelDataFromFile(listFilesForFolder(levelFolder).get(fileId));
+        }
+        catch (IOException e) {
+            System.out.println("ERROR - No levels found. Exiting");
+            return;
+        }
+    }
+
+    // Loads all level data into local variables
+    void loadLevelDataFromFile(final File file) throws IOException {
+
+        HashMap<String, String> values = new HashMap<String, String>();
+        HashMap<Coord, String> specialTiles = new HashMap<Coord, String>();
+        ArrayList<Integer> tileRarityWeights = new ArrayList<Integer>();
+        
+        Scanner scanner = new Scanner(file);
+
+        while (scanner.hasNextLine()) {
+            String[] line = scanner.nextLine().split(" = ");
+            switch(line[0]) {
+                case "special tiles:":
+                    for(int i = 0; i < Integer.parseInt(values.get("special tile count")); ++i) {
+                        line = scanner.nextLine().split(" ");
+                        Coord coord = new Coord(Integer.parseInt(line[0]), Integer.parseInt(line[1]));
+                        specialTiles.put(coord, line[2]);
+                    }
+                    break;
+                case "tile probabilities:":
+                    for(int i = 0; i < Integer.parseInt(values.get("tile type count")); ++i)
+                        tileRarityWeights.add(Integer.parseInt(scanner.nextLine()));
+                    break;
+                default:
+                    if(line.length >= 2)
+                        values.put(line[0], line[1]);
+            }
+        }
+
+        scanner.close();
+        
+        levelName = values.get("name");
+        tableBitSizeX = Integer.parseInt(values.get("bitSizeX")); 
+        tableBitSizeY = Integer.parseInt(values.get("bitSizeY"));
+        tableValueCount = Integer.parseInt(values.get("tile type count"));
+        minPatternSize = Integer.parseInt(values.get("min pattern size"));
+        gravityType = Integer.parseInt(values.get("gravity type"));
+        wildFieldChance = Float.parseFloat(values.get("wild tile frequency"));
+
+        System.out.println(levelName);
+        
+        tableWidth = 1 << tableBitSizeX;
+        tableHeight = 1 << tableBitSizeY;
+
+        rectangles = new Button[tableWidth * tableHeight];
+
+        // Unused for now
+        replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));
+        
+    }
+
+    ArrayList<File> listFilesForFolder(final File folder) throws IOException {
+        ArrayList<File> result = new ArrayList<File>();
+        for (final File file : folder.listFiles()) {
+            if (file.isDirectory()) {
+                listFilesForFolder(file);
+            } else {
+                result.add(file);
+            }
+        }
+        return result;
+    }
 
 };
