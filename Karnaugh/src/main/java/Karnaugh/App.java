@@ -31,26 +31,8 @@ import java.io.IOException;
 
 public class App extends Application {
 
-    // Default UI element sizes and offsets
-    static int SQUARE_SIZE = 100;
-    static int MIRROR_SIZE = 5;
-    static int MIRROR_FREQUENCY = 4; // mirrors appear every 4 squares, but I've put it as a variable in case I'm wrong
-    static int SCOREBAR_WIDTH = 150;
-    static int BASE_X_OFFSET = 75;
-    static int BASE_Y_OFFSET = 75;
-    static int BOTTOM_PAD = 75;
-
-    // Input handling
-    static Coord lastSelectedTile = null;
-    static boolean lockClicking = false;
-
     // Main data structures
     public static Map<Integer, String> colorDict = new HashMap<>();     // Tile value-to-color map
-    ArrayList<Coord> highlightedTiles = new ArrayList<>();
-
-    // Score
-    Text scoreTextField;
-    int score = 0;
 
     // .fxml scene
     public static Scene scene;

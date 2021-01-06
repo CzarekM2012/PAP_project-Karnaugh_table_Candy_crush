@@ -249,8 +249,6 @@ public class Game{
                 });
 
             }
-
-
    
         }
         
@@ -283,16 +281,19 @@ public class Game{
         updateTable();
 
     }
+    
 
-
+    // Extracts hex color string from a string following the template: "-fx-backgrond-color: #ffffff;" 
     public String getColorFromStyle(String style){
         return style.substring(style.length() - 7,style.length() - 1);
     }
 
+    // Returns background color as a string with hex code for color (RGB)
     public String getTileColor(int x, int y){
         return getColorFromStyle(getRectangleAt(x, y).getStyle());
     }
 
+    // Sets background color to a color corresponding to hex string given as an argument (6 characters (a-f 0-9))
     void setTileColor(int x, int y, String color) {
         getRectangleAt(x, y).setStyle("-fx-background-color: #" + color + ";");
     }
@@ -300,10 +301,14 @@ public class Game{
     // Highlights a tile by desaturating it. Highlighted tiles can be cleared using removeHighlights()
     void highlightTile(Coord tile) {highlightTile(tile.x, tile.y);}
 
+
+    // Desaturates color twice by converting it to color object, calling desaturate() method on it, and then converting it back to a hex string
     String getHighligthedColor(String hexCode){
         Color color = Color.web("0x" + hexCode);
         color = color.desaturate();
         color = color.desaturate();
+
+        // toString() returns "#RRGGBBAA"
         return color.toString().substring(2, 8);
     }
 
@@ -337,6 +342,7 @@ public class Game{
         setTileColor(x, y, color);
     }
 
+    // Updates all coords in a list
     void updateTiles(ArrayList<Coord> coords) {
         for(Coord coord : coords)
             updateTile(coord);
@@ -394,7 +400,7 @@ public class Game{
         }
 
         // else acknowledge the swap in the logical model, update the gui and go on to DESTROY
-
+        updateTable();
         // Destroy patterns until none remain
         do {
             // Seek

@@ -22,7 +22,6 @@
 
 
 #sidebar{
-    -fx-border-color: cyan;
     -fx-border-width: 1;
     -fx-background-color: lightgrey;
 }
