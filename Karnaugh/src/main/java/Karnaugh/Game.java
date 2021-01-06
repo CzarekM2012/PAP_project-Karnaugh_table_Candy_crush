@@ -64,7 +64,7 @@ public class Game{
 
     // Input handling
     static Coord lastSelectedTile = null;
-    static boolean lockClicking = false;
+    volatile static boolean lockClicking = false;
 
     // File I/O
     String levelFolderPath = "config/levels";
@@ -77,12 +77,15 @@ public class Game{
     int score;
     volatile float secondsRemaining;
     volatile float timeGain;
+    volatile boolean lost = false;
     
     // Returns a reference to a rectangle on the board
     public Button getRectangleAt(int xRctg, int yRctg) {return rectangles[yRctg * tableWidth + xRctg];}
 
     void onGameLost() {
         System.out.println("Game Lost!\nScore: " + score);
+        setGameLost();
+        //lockClicking();
     }
 
     void updateCountdown() {
@@ -93,15 +96,21 @@ public class Game{
         if(timeGain > timeGainMin)
             timeGain -= timeGainDecrease;
     };
-    synchronized void decreaseCountdown() {secondsRemaining -= 1;}
     synchronized void increaseCountdown(float times) {
         secondsRemaining += timeGain * times;
         if(secondsRemaining > timeLimitMax)
             secondsRemaining = timeLimitMax;
     }
+    synchronized void decreaseCountdown() {secondsRemaining -= 1;}
+    synchronized void setGameLost() {lost = true;}
+    synchronized boolean isGameLost() {return lost;}
+    synchronized void lockClicking() {lockClicking = true;}
+    synchronized void unlockClicking() {lockClicking = false;}
+    synchronized boolean areClicksLocked() {return lockClicking;}
     synchronized boolean isCountdownFinished() {return secondsRemaining < 0;}
 
-    public void startGame() throws IOException{
+
+    public void startGame() throws IOException {
 
         loadLevel(0);
 
@@ -216,9 +225,9 @@ public class Game{
                 btn.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        if(lockClicking)
+                        if(areClicksLocked())
                             return;
-                        lockClicking = true;
+                        lockClicking();
                         
                         // These coords tell which rectangle was pressed
                         final int xOfRctg = (int) (((event.getSceneX()) - leftPad.getWidth())/ btn.getWidth()); // x coordinate of the rectangle
@@ -254,6 +263,9 @@ public class Game{
             public void handle(MouseEvent event) {
                 try{
                 App.setRoot("menu");
+                task.cancel();
+                timer.cancel();
+                timer.purge();
                 return;
                 }   catch (Exception e){;};
 
@@ -344,7 +356,7 @@ public class Game{
         if(lastSelectedTile == null) {
             lastSelectedTile = new Coord(x, y);
             highlightNeighbours(x, y);
-            lockClicking = false;
+            unlockClicking();
             return;
         }
 
@@ -358,7 +370,7 @@ public class Game{
         
         // Makes sure that tiles are swapped only "1 bit away"
         if(!karnaugh.adjacentFields(firstTile).contains(secondTile)){
-            lockClicking = false;
+            unlockClicking();
             return;
         }
 
@@ -377,7 +389,7 @@ public class Game{
             // if not - reverse the swap as if nothing happened
             karnaugh.swapTiles(firstTile, secondTile);
             sleep(ANIMATION_DELAY);
-            lockClicking = false;
+            unlockClicking();
             return;
         }
 
@@ -438,8 +450,9 @@ public class Game{
 
         } while(!tilesToDestroy.isEmpty());
 
-        lockClicking = false;
-
+        System.out.println("TEST UNLOCK 1 " + areClicksLocked());
+        unlockClicking();
+        System.out.println("TEST UNLOCK 2 " + areClicksLocked());
     }
 
     // Adds a value to score, more of a placeholder for now
