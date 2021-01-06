@@ -2,4 +2,8 @@
     -fx-background-image: url('./images/padding.jpg');
     -fx-background-size: cover;
  }
+
+ #rectangle{
+    -fx-background-radius: 0,0,0,0;
+ }
  

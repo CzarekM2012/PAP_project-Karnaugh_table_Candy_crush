@@ -86,6 +86,7 @@ public class Game{
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 Button btn = new Button();
+                btn.setId("rectangle");
                 btn.setPrefHeight(480/HEIGHT);
                 btn.setPrefWidth(480/WIDTH);
                 btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(WIDTH));
