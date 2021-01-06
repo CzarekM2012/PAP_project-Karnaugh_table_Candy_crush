@@ -57,7 +57,7 @@ public class App extends Application {
 
     // Main data structures
     KarnaughTable karnaugh;                                             // Main karnaugh table, the core element of the game
-    public static Map<Integer, Color> colorDict = new HashMap<>();     // Tile value-to-color map
+    public static Map<Integer, String> colorDict = new HashMap<>();     // Tile value-to-color map
     ArrayList<Coord> highlightedTiles = new ArrayList<>();
 
     // Score
@@ -83,13 +83,13 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        colorDict.put(0, Color.web("577590"));
-        colorDict.put(1, Color.web("90be6d"));
-        colorDict.put(2, Color.web("f8961e"));
-        colorDict.put(3, Color.web("f94144"));
-        colorDict.put(4, Color.web("48cae4"));
-        colorDict.put(5, Color.web("f9c74f"));
-        colorDict.put(6, Color.web("f3722c"));
+        colorDict.put(0, "577590");
+        colorDict.put(1, "90be6d");
+        colorDict.put(2, "f8961e");
+        colorDict.put(3, "f94144");
+        colorDict.put(4, "48cae4");
+        colorDict.put(5, "f9c74f");
+        colorDict.put(6, "f3722c");
         launch(args);
     }
 
@@ -129,174 +129,6 @@ public class App extends Application {
 
     static public void quitGame(){
         Platform.exit();
-    }
-
-    void setTileColor(int x, int y, Color color) {
-        getRectangleAt(x, y).setFill(color);
-    }
-
-    // Highlights a tile by desaturating it. Highlighted tiles can be cleared using removeHighlights()
-    void highlightTile(Coord tile) {highlightTile(tile.x, tile.y);}
-    void highlightTile(int x, int y) {
-        //System.out.println("Highlighing " + x + ", " + y);
-        highlightedTiles.add(new Coord(x, y));
-
-        Rectangle tile = getRectangleAt(x, y);
-        Color color = (Color)tile.getFill();
-        color = color.desaturate();
-        color = color.desaturate();
-        tile.setFill(color);
-    }
-
-    void highlightTiles(ArrayList<Coord> coords) {
-        for(Coord tile : coords)
-            highlightTile(tile.x, tile.y);
-    }
-
-    void highlightNeighbours(int x, int y) {
-        highlightTiles(karnaugh.adjacentFields(new Coord(x, y)));
-    }
-
-    void removeHighlights() {
-        for(Coord tile : highlightedTiles)
-            updateTile(tile); // reset color
-        highlightedTiles.clear();
-    }
-
-    // Redraws a tile with given coordinates
-    void updateTile(Coord coord) {updateTile(coord.x, coord.y);}
-    void updateTile(int x, int y) {
-        Color color = colorDict.get(karnaugh.getTileValue(x, y));
-        setTileColor(x, y, color);
-    }
-
-    void updateTiles(ArrayList<Coord> coords) {
-        for(Coord coord : coords)
-            updateTile(coord);
-    }
-
-    // Redraws whole table
-    void updateTable() {
-        for(int x = 0; x < karnaugh.getSizeX(); ++x)
-            for(int y = 0; y < karnaugh.getSizeY(); ++y)
-                updateTile(x, y);
-    }
-
-    // Input processing function
-    // decides when to swap tiles
-    void onTileSelected(int x, int y) {
-
-        if(lastSelectedTile == null) {
-            lastSelectedTile = new Coord(x, y);
-            highlightNeighbours(x, y);
-            lockClicking = false;
-            return;
-        }
-
-        trySwapTiles(new Coord(lastSelectedTile), new Coord(x, y));
-        lastSelectedTile = null;
-    }
-
-
-    void trySwapTiles(Coord firstTile, Coord secondTile) {
-        removeHighlights();
-        
-        // Makes sure that tiles are swapped only "1 bit away"
-        if(!karnaugh.adjacentFields(firstTile).contains(secondTile)){
-            lockClicking = false;
-            return;
-        }
-
-        ArrayList<Coord> tilesToDestroy;
-        ArrayList<Coord> movedTiles = new ArrayList<Coord>();
-        movedTiles.add(new Coord(firstTile.x, firstTile.y));
-        movedTiles.add(new Coord(secondTile.x, secondTile.y));
-
-        // we have to make sure that after the move, DESTRUCTION occurs
-
-        karnaugh.swapTiles(firstTile, secondTile); // firstly: we swap the tiles in the table's logical model but don't update the gui yet
-       
-
-        // Check whether, after the swap that occured in the logical model, there are any DESTRUCTION possibilities
-        if(karnaugh.fieldsToDestroy(firstTile).size() == 0 && karnaugh.fieldsToDestroy(secondTile).size() == 0){
-            // if not - reverse the swap as if nothing happened
-            karnaugh.swapTiles(firstTile, secondTile);
-            sleep(ANIMATION_DELAY);
-            lockClicking = false;
-            return;
-        }
-
-        // else acknowledge the swap in the logical model, update the gui and go on to DESTROY
-
-        // Destroy patterns until none remain
-        do {
-            // Seek
-            tilesToDestroy = new ArrayList<Coord>();
-            for(Coord tile : movedTiles) {
-                int lastSize = tilesToDestroy.size();
-                
-                ArrayList<Coord> toAdd = karnaugh.fieldsToDestroy(tile);
-                toAdd.removeAll(tilesToDestroy); // Removing duplicates
-                tilesToDestroy.addAll(toAdd);
-
-                // Only show updates if something actually changed
-                if(lastSize != tilesToDestroy.size()) {
-                    removeHighlights();
-                    //KarnaughTable.printTiles(tilesToDestroy);
-                    highlightTiles(tilesToDestroy);
-                    sleep(ANIMATION_DELAY);
-                }
-            }
-
-            
-            updateTable();
-
-            addScore(tilesToDestroy.size());
-            removeHighlights();
-
-            // Destroy
-            //KarnaughTable.printTiles(tilesToDestroy);
-            karnaugh.destroyFields(tilesToDestroy);
-            updateTable();
-            sleep(ANIMATION_DELAY);
-            
-            // Collapse
-            movedTiles = karnaugh.collapseGetTiles(ReplacementSource.Top);
-            //KarnaughTable.printTiles(movedTiles);
-            updateTable();
-            sleep(ANIMATION_DELAY);
-
-            highlightTiles(movedTiles);
-            sleep(ANIMATION_DELAY);
-            removeHighlights();
-
-            // Refill
-            movedTiles.addAll(karnaugh.fillWithRandoms());
-            updateTable();
-            sleep(ANIMATION_DELAY);
-            removeHighlights();
-
-        } while(!tilesToDestroy.isEmpty());
-
-        lockClicking = false;
-
-    }
-
-    // Adds a value to score, more of a placeholder for now
-    void addScore(int value) {
-        score += value;
-        updateScore();
-    }
-
-    void updateScore() {
-        scoreTextField.setText(Integer.toString(score));
-    }
-
-    // Just a tiny function to make code cleaner
-    void sleep(int timeMs) {
-        try {
-            Thread.sleep(timeMs);
-        } catch(Exception e) {};
     }
 
 }
