@@ -62,13 +62,9 @@ public class Game{
         GridPane gameLayout = new GridPane();
         VBox sidebarLayout = new VBox();
         wholeLayout.getChildren().addAll(leftPad, gameLayout, sidebarLayout, rightPad);
-
-
-
-
+        
         wholeLayout.setPrefWidth(SCENE_HEIGHT);
         gameLayout.minWidthProperty().bind(App.scene.heightProperty());
-
         leftPad.prefWidthProperty().bind(rightPad.prefWidthProperty());
         
 
@@ -81,6 +77,7 @@ public class Game{
         wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
         wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
 
+        App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
         App.setLayoutAsScene(wholeLayout);
     }
 
