@@ -1,0 +1,47 @@
+.root{
+    -fx-background-image: url('./images/board_v3.png');
+    -fx-background-size: cover;
+    -fx-padding: 0;
+}
+
+#gameTitle .text{
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+}
+
+
+
+#gameTitle {
+    -fx-text-fill: linear-gradient(from 0% 0% to 100% 100%, yellow 0%, red 100%);
+    -fx-font-size: 50pt;
+    -fx-font-family: sans-serif;
+    -fx-padding: 30 0 30 0;
+}
+.button{
+    -fx-cursor: hand;
+    -fx-pref-width: 300px;
+    -fx-font-size: 20pt;
+    -fx-font-family: sans-serif;
+    -fx-background-radius: 30,30,30,30;
+}
+
+.button:hover{
+    -fx-pref-width: 400px;
+}
+
+#startButton {
+    -fx-graphic: url('./images/start.png');
+}
+
+#highscoreButton {
+    -fx-graphic: url('./images/highscores.png');
+}
+
+#quitButton {
+    -fx-background-color: red;
+    -fx-graphic: url('./images/quit.png');
+}
+
+#quitButton .text{
+    -fx-font-fill: white;
+}

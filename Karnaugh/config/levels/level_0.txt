@@ -1,0 +1,12 @@
+name = Classic
+bitSizeX = 3
+bitSizeY = 3
+tile type count = 4
+min pattern size = 4
+gravity type = 1
+wild tile frequency = 0.05
+time limit max = 100
+time gain per tile = 4
+time gain min = 0.1
+time gain decrease = 0.03
+difficulty = Normal

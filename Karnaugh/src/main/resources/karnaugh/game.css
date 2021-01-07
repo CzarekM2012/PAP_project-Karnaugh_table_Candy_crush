@@ -1,0 +1,114 @@
+.root{
+    -fx-background-image: url('./images/padding.jpg');
+    -fx-background-size: cover;
+    -fx-preserve-ratio: true;
+}
+
+#main_menu_button{
+    -fx-background-color: rgb(150, 0, 0);
+    -fx-text-fill: white;
+    -fx-font-size: 12pt;
+}
+
+#main_menu_button:hover{
+    -fx-background-color: red;
+    -fx-cursor: hand;
+}
+
+
+#game .button{
+    -fx-background-radius: 0,0,0,0;
+    -fx-background-color: white;
+}
+
+
+#sidebar{
+    -fx-border-width: 1;
+    -fx-background-color: lightgrey;
+}
+    
+ #rectangle{
+    -fx-border-color:black;
+    -fx-border-width: 1 1 1 1;
+}
+
+
+#rectangle_right{
+    -fx-border-color:black white black black;
+    -fx-border-width: 1 1 1 1;
+} 
+
+#rectangle_left{
+    -fx-border-color:black black black white;
+    -fx-border-width: 1 1 1 1;
+}
+
+#rectangle_top{
+    -fx-border-color:white black black black;
+    -fx-border-width: 1 1 1 1;
+}
+
+#rectangle_bottom{
+    -fx-border-color:black black white black;
+    -fx-border-width: 1 1 1 1;
+}
+
+
+#rectangle_right_bottom{
+    -fx-border-color:black white white black;
+    -fx-border-width: 1 1 1 1;
+}
+
+#rectangle_right_top{
+    -fx-border-color:white white black black;
+    -fx-border-width: 1 1 1 1;
+}
+
+#rectangle_left_bottom{
+    -fx-border-color:black black white white;
+    -fx-border-width: 1 1 1 1;
+}
+
+#rectangle_left_top{
+    -fx-border-color:white black black white;
+    -fx-border-width: 1 1 1 1;
+}
+
+
+
+
+/* Actually stylizes highscore scene*/
+
+#highscores{
+    -fx-background-image: url('./images/highscore_bg.png');
+    -fx-background-size: cover;
+}
+
+
+#score{
+    -fx-fill: rgb(38, 10, 165);
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+    -fx-font-size: 20pt;
+}
+
+#first {
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+    -fx-fill: gold;
+    -fx-font-size: 35pt;
+}
+
+#second{
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+    -fx-fill: silver;
+    -fx-font-size: 30pt;
+}
+
+#third{
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+    -fx-fill: #cd7f32;
+    -fx-font-size: 25pt;
+}
