@@ -86,7 +86,7 @@ public class Game{
     void onGameLost() {
         System.out.println("Game Lost!\nScore: " + score);
         setGameLost();
-        //lockClicking();
+        lockClicking();
     }
 
     void updateCountdown() {
