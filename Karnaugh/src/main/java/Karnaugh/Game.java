@@ -66,9 +66,6 @@ public class Game{
     static Coord lastSelectedTile = null;
     volatile static boolean lockClicking = false;
 
-    // File I/O
-    String levelFolderPath = "config/levels";
-
     // Main data structures
     KarnaughTable karnaugh;                                             // represents logic beneath the game
     public static Map<Integer, String> colorDict = App.colorDict;       // stores tile colors
@@ -111,14 +108,11 @@ public class Game{
 
 
     public void startGame() throws IOException {
-
-        // TUTAJ ŁADUJE POZIOMY
-        loadLevel(0);
-
+        
         score = 0;
         System.out.println("Starting game");
         karnaugh = new KarnaughTable(tableBitSizeX, tableBitSizeY, tableValueCount, minPatternSize, wildFieldChance, replacementSourcesSet);
-
+        
         System.out.println("Starting timer");
         secondsRemaining = timeLimitMax;    // Thread safe, no threads just yet
         timeGain = timeGainPerTile;
@@ -284,8 +278,7 @@ public class Game{
 
         // changes root of the scene to wholeLayout - the "topmost" parent layer of the game "scene"
         App.setLayoutAsScene(wholeLayout);
-
-
+        
         updateTable();
     }
     
@@ -483,88 +476,6 @@ public class Game{
         try {
             Thread.sleep(timeMs);
         } catch(Exception e) {};
-    }
-
-
-    // Loads level from file, resets game, creates and redraws the table
-    void loadLevel(int fileId) {
-        final File levelFolder = new File(levelFolderPath);
-        System.out.println(levelFolder.getAbsolutePath());
-
-        try {
-            loadLevelDataFromFile(listFilesForFolder(levelFolder).get(fileId));
-        }
-        catch (IOException e) {
-            System.out.println("ERROR - No levels found. Exiting");
-            return;
-        }
-    }
-
-    // Loads all level data into local variables
-    void loadLevelDataFromFile(final File file) throws IOException {
-
-        HashMap<String, String> values = new HashMap<String, String>();
-        HashMap<Coord, String> specialTiles = new HashMap<Coord, String>();
-        ArrayList<Integer> tileRarityWeights = new ArrayList<Integer>();
-        
-        Scanner scanner = new Scanner(file);
-
-        while (scanner.hasNextLine()) {
-            String[] line = scanner.nextLine().split(" = ");
-            switch(line[0]) {
-                case "special tiles:":
-                    for(int i = 0; i < Integer.parseInt(values.get("special tile count")); ++i) {
-                        line = scanner.nextLine().split(" ");
-                        Coord coord = new Coord(Integer.parseInt(line[0]), Integer.parseInt(line[1]));
-                        specialTiles.put(coord, line[2]);
-                    }
-                    break;
-                case "tile probabilities:":
-                    for(int i = 0; i < Integer.parseInt(values.get("tile type count")); ++i)
-                        tileRarityWeights.add(Integer.parseInt(scanner.nextLine()));
-                    break;
-                default:
-                    if(line.length >= 2)
-                        values.put(line[0], line[1]);
-            }
-        }
-
-        scanner.close();
-        
-        levelName = values.get("name");
-        tableBitSizeX = Integer.parseInt(values.get("bitSizeX")); 
-        tableBitSizeY = Integer.parseInt(values.get("bitSizeY"));
-        tableValueCount = Integer.parseInt(values.get("tile type count"));
-        minPatternSize = Integer.parseInt(values.get("min pattern size"));
-        gravityType = Integer.parseInt(values.get("gravity type"));
-        wildFieldChance = Float.parseFloat(values.get("wild tile frequency"));
-        timeLimitMax = Float.parseFloat(values.get("time limit max"));
-        timeGainPerTile = Float.parseFloat(values.get("time gain per tile"));
-        timeGainMin = Float.parseFloat(values.get("time gain min"));
-        timeGainDecrease = Float.parseFloat(values.get("time gain decrease"));
-
-        System.out.println(levelName);
-        
-        tableWidth = 1 << tableBitSizeX;
-        tableHeight = 1 << tableBitSizeY;
-
-        rectangles = new Button[tableWidth * tableHeight];
-
-        // Unused for now
-        replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));
-        
-    }
-
-    ArrayList<File> listFilesForFolder(final File folder) throws IOException {
-        ArrayList<File> result = new ArrayList<File>();
-        for (final File file : folder.listFiles()) {
-            if (file.isDirectory()) {
-                listFilesForFolder(file);
-            } else {
-                result.add(file);
-            }
-        }
-        return result;
     }
 
 };

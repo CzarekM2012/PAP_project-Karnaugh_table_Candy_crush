@@ -2,13 +2,24 @@ package karnaugh;
 
 import java.io.IOException;
 import javafx.fxml.FXML;
+// import javafx.scene.Parent;
+// import javafx.scene.Scene;
+// import javafx.stage.Stage;
+// import javafx.fxml.FXMLLoader;
 
 public class MenuController {
 
+    // private static Parent loadFXML(String fxml) throws IOException {
+    //     FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+    //     return fxmlLoader.load();
+    // }
+
     @FXML
     private void startClicked() throws IOException {
-        Game game = new Game();
-        game.startGame();
+        // Scene scene = new Scene(loadFXML("levelMenu"), 640, 480);
+
+        // App.stage.setScene(scene);
+        App.setRoot("levelMenu");
     }
     
     @FXML

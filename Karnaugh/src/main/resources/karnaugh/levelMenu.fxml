@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="karnaugh.LevelMenuController">
+   <top>
+      <SplitPane dividerPositions="0.5501672240802675" prefHeight="56.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="54.0" prefWidth="335.0">
+               <children>
+                  <Label fx:id="selectTextLabel" contentDisplay="CENTER" layoutX="25.0" layoutY="2.0" prefHeight="50.0" prefWidth="196.0" text="Select level:">
+                     <font>
+                        <Font size="33.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <Button layoutX="145.0" layoutY="8.0" mnemonicParsing="false" onAction="#backClicked" prefHeight="38.0" prefWidth="107.0" text="Back to menu" />
+                  <Button layoutX="14.0" layoutY="8.0" mnemonicParsing="false" onAction="#refreshClicked" prefHeight="38.0" prefWidth="107.0" text="Refresh" />
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </top>
+   <center>
+      <TableView fx:id="levelTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="nameColumn" prefWidth="329.0" text="Level name" />
+          <TableColumn fx:id="sizeColumn" minWidth="0.0" prefWidth="92.0" text="Size" />
+            <TableColumn fx:id="colorsColumn" prefWidth="89.0" text="Colors" />
+            <TableColumn fx:id="difficultyColumn" prefWidth="89.0" text="Difficulty" />
+        </columns>
+      </TableView>
+   </center>
+</BorderPane>
