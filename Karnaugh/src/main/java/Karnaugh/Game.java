@@ -67,8 +67,8 @@ public class Game{
     final int SIDEBAR_WIDTH = 160; // Maximal width of the sidebar containing main menu button, score, etc.
 
     // Input handling
-    static Coord lastSelectedTile = null;
-    volatile static boolean lockClicking = false;
+    Coord lastSelectedTile = null;
+    boolean lockClicking = false;
 
     // Main data structures
     KarnaughTable karnaugh;                                             // represents logic beneath the game
