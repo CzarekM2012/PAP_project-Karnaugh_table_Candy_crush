@@ -94,7 +94,7 @@ public class App extends Application {
         // }
     }
 
-    static public double aspectRatio = 5/3;
+    static public double aspectRatio = 4/3;
     static public Stage stage;
 
     @Override
