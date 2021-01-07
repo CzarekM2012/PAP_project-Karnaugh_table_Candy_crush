@@ -112,6 +112,7 @@ public class Game{
 
     public void startGame() throws IOException {
 
+        // TUTAJ ŁADUJE POZIOMY
         loadLevel(0);
 
         score = 0;
@@ -285,9 +286,7 @@ public class Game{
         App.setLayoutAsScene(wholeLayout);
 
 
-        App.stage.sizeToScene();
         updateTable();
-
     }
     
 

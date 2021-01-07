@@ -29,18 +29,6 @@
     -fx-pref-width: 400px;
 }
 
-#startButton:hover{
-    -fx-background-color: blue;
-}
-
-#highscoreButton:hover{
-    -fx-background-color: green;
-}
-
-#quitButton:hover{
-    -fx-background-color: red;
-}
-
 #startButton {
     -fx-graphic: url('./images/start.png');
 }
@@ -50,6 +38,10 @@
 }
 
 #quitButton {
-    -fx-background-color: #eb3467;
+    -fx-background-color: red;
     -fx-graphic: url('./images/quit.png');
+}
+
+#quitButton .text{
+    -fx-font-fill: white;
 }
