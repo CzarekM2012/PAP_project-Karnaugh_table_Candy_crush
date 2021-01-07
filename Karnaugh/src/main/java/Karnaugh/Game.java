@@ -19,6 +19,7 @@ import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -58,6 +59,9 @@ public class Game{
     float timeGainDecrease;                 // How fast will time gain decrease (0.1 means 0.1s per second)
     Set<ReplacementSource> replacementSourcesSet;
 
+    Label scoreLabel = new Label("0");
+    Label timeLabel = new Label("0");
+
     // Layout
     final int ANIMATION_DELAY = 50;
     final int SIDEBAR_WIDTH = 160; // Maximal width of the sidebar containing main menu button, score, etc.
@@ -82,7 +86,7 @@ public class Game{
     void onGameLost() {
         System.out.println("Game Lost!\nScore: " + score);
         setGameLost();
-        //lockClicking();
+        lockClicking();
     }
 
     void updateCountdown() {
@@ -97,6 +101,7 @@ public class Game{
         secondsRemaining += timeGain * times;
         if(secondsRemaining > timeLimitMax)
             secondsRemaining = timeLimitMax;
+        
     }
     synchronized void decreaseCountdown() {secondsRemaining -= 1;}
     synchronized void setGameLost() {lost = true;}
@@ -128,6 +133,7 @@ public class Game{
                     updateCountdown();
                     decreaseCountdown();
                     decreaseTimeGain();
+                    updateTime();
                 }
             }
         };
@@ -200,20 +206,16 @@ public class Game{
 
                 btn.setId(id);
 
-                // sets base size of the buttons, actually useless
-                btn.setPrefHeight(480/tableHeight);
-                btn.setPrefWidth(480/tableWidth);
-
                 // makes buttons resize with window, and thus gameLayout, resizing
-                btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(tableWidth));
-                btn.prefWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
-
+                btn.prefHeightProperty().bind(gameLayout.heightProperty());
+                btn.minWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
+                
                 // changes the cursor when hovering over the button
                 btn.setCursor(Cursor.HAND);
                 
                 // adds reference to the button to the array; and then adds it to the layout at correct positions
                 rectangles[y * tableWidth + x] = btn;
-
+                App.stage.minWidthProperty().bind(App.scene.heightProperty().multiply((tableWidth)/tableHeight).add(SIDEBAR_WIDTH));
                 gameLayout.add(btn, x+1, y +1); // "+1" as I'll soon add labels at x = 0 and y = 0;
 
                 // Rectangle input handling
@@ -266,7 +268,13 @@ public class Game{
         });
         
         sidebarLayout.getChildren().add(mainMenuButton);
-
+        sidebarLayout.getChildren().add(new Label(""));
+        sidebarLayout.getChildren().add(new Label(""));
+        sidebarLayout.getChildren().add(new Label(""));
+        sidebarLayout.getChildren().add(new Label("Score:"));
+        sidebarLayout.getChildren().add(scoreLabel);
+        sidebarLayout.getChildren().add(new Label("Time:"));
+        sidebarLayout.getChildren().add(timeLabel);
         // applies .css styling to the scene
         App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
 
@@ -473,9 +481,22 @@ public class Game{
         updateScore();
     }
 
-    void updateScore() {
-        //scoreTextField.setText(Integer.toString(score));
+    void updateScore(){
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                scoreLabel.setText(Integer.toString(score));     
+            }
+          });
     }
+
+    void updateTime() {
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                timeLabel.setText(Integer.toString((int)secondsRemaining));     
+            }
+          });
+    }
+
 
     // Just a tiny function to make code cleaner
     void sleep(int timeMs) {

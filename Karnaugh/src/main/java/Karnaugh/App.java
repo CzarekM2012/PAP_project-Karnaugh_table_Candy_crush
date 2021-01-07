@@ -100,7 +100,7 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         // Preparing window
-        primaryStage.setTitle("Bekarnaughed");
+        primaryStage.setTitle("Karnaugh");
         primaryStage.setMinWidth(640);
         primaryStage.setMinHeight(480);
 
