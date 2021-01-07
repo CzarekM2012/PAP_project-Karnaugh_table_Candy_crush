@@ -168,8 +168,8 @@ public class LevelMenuController {
     void startGameFromLevelFile(final File file) throws IOException {
 
         HashMap<String, String> values = new HashMap<String, String>();
-        HashMap<Coord, String> specialTiles = new HashMap<Coord, String>();
-        ArrayList<Integer> tileRarityWeights = new ArrayList<Integer>();
+        HashSet<Coord> specialTiles = new HashSet<Coord>();
+        //ArrayList<Integer> tileRarityWeights = new ArrayList<Integer>();
         
         Scanner scanner = new Scanner(file);
 
@@ -180,13 +180,16 @@ public class LevelMenuController {
                     for(int i = 0; i < Integer.parseInt(values.get("special tile count")); ++i) {
                         line = scanner.nextLine().split(" ");
                         Coord coord = new Coord(Integer.parseInt(line[0]), Integer.parseInt(line[1]));
-                        specialTiles.put(coord, line[2]);
+                        if(line[2].equals("block"))
+                        {
+                            specialTiles.add(coord);   
+                        }
                     }
                     break;
-                case "tile probabilities:":
+                /*case "tile probabilities:":
                     for(int i = 0; i < Integer.parseInt(values.get("tile type count")); ++i)
                         tileRarityWeights.add(Integer.parseInt(scanner.nextLine()));
-                    break;
+                    break;*/
                 default:
                     if(line.length >= 2)
                         values.put(line[0], line[1]);
@@ -214,7 +217,20 @@ public class LevelMenuController {
         game.rectangles = new Button[game.tableWidth * game.tableHeight];
         game.replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));
 
-        game.startGame();
+
+        KarnaughTable karnaugh = new KarnaughTable(game.tableBitSizeX, game.tableBitSizeY, game.tableValueCount, game.minPatternSize, game.wildFieldChance, game.replacementSourcesSet);
+        boolean shouldReroll = false;
+        for(Coord coord : specialTiles)
+        {
+            karnaugh.set(coord, KarnaughTable.blockadeField);
+            shouldReroll = true;
+        }
+        if(shouldReroll)
+        {
+            karnaugh.reroll();
+        }
+
+        game.startGame(karnaugh);
         
     }
 }

@@ -107,11 +107,11 @@ public class Game{
     synchronized boolean isCountdownFinished() {return secondsRemaining < 0;}
 
 
-    public void startGame() throws IOException {
+    public void startGame(KarnaughTable karnaugh) throws IOException {
         
         score = 0;
         System.out.println("Starting game");
-        karnaugh = new KarnaughTable(tableBitSizeX, tableBitSizeY, tableValueCount, minPatternSize, wildFieldChance, replacementSourcesSet);
+        this.karnaugh = karnaugh;
         
         System.out.println("Starting timer");
         secondsRemaining = timeLimitMax;    // Thread safe, no threads just yet
