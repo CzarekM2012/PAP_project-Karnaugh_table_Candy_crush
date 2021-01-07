@@ -14,6 +14,7 @@ public class MenuController {
     @FXML
     private void highscoreClicked() throws IOException {
         System.out.print("Highscore clicked.\n");
+        App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
         App.showHighscores();
     }
     

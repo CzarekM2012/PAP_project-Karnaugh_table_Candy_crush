@@ -75,3 +75,40 @@
 }
 
 
+
+
+/* Actually stylizes highscore scene*/
+
+#highscores{
+    -fx-background-image: url('./images/highscore_bg.png');
+    -fx-background-size: cover;
+}
+
+
+#score{
+    -fx-fill: rgb(38, 10, 165);
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+    -fx-font-size: 20pt;
+}
+
+#first {
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+    -fx-fill: gold;
+    -fx-font-size: 35pt;
+}
+
+#second{
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+    -fx-fill: silver;
+    -fx-font-size: 30pt;
+}
+
+#third{
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+    -fx-fill: #cd7f32;
+    -fx-font-size: 25pt;
+}

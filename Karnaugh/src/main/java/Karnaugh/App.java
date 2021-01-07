@@ -23,6 +23,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.*;
 import javafx.scene.Parent;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
@@ -104,11 +105,12 @@ public class App extends Application {
         primaryStage.setMinHeight(480);
 
         stage = primaryStage;
-        primaryStage.minWidthProperty().bind(primaryStage.heightProperty().multiply(aspectRatio));
+    
         
         scene = new Scene(loadFXML("menu"), 640, 480);
 
         primaryStage.setScene(scene);
+        
         
         
     /*  Reference on how to add properties to nodes by fxid
@@ -121,9 +123,46 @@ public class App extends Application {
     */
         primaryStage.show();
     }
+
+    // not optimal way, might later change it to load all at once 
+    static public String loadScore(String filename, int entry){
+        //TODO: implement actually loading scores
+        return "AAAAAAAAAAAAAAAAAA";
+    }
      
     static public void showHighscores(){
+        final int numOfScores = 10;
 
+        VBox list = new VBox();
+        list.setId("highscores");
+        list.setAlignment(Pos.BASELINE_CENTER);
+
+        for(int i = 0; i < numOfScores; i++){
+            Text text = new Text((i + 1) + ". " + loadScore("filename here", i));
+            
+            if(i==0){text.setId("first");}
+            else if (i==1){text.setId("second");}
+            else if (i==2){text.setId("third");}
+            else{text.setId("score");}
+
+            list.getChildren().add(text);
+        }
+
+        Button returnToMenuButton = new Button("Return to menu");
+        returnToMenuButton.setId("main_menu_button");
+        returnToMenuButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                try{
+                    App.setRoot("menu");
+                return;
+                }   catch (Exception e){;};
+
+            }
+        });
+        
+        list.getChildren().add(returnToMenuButton);
+        setLayoutAsScene(list);
     } 
 
     static public void quitGame(){
