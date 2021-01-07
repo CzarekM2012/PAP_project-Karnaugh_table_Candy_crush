@@ -206,20 +206,16 @@ public class Game{
 
                 btn.setId(id);
 
-                // sets base size of the buttons, actually useless
-                btn.setPrefHeight(480/tableHeight);
-                btn.setPrefWidth(480/tableWidth);
-
                 // makes buttons resize with window, and thus gameLayout, resizing
-                btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(tableWidth));
-                btn.prefWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
-
+                btn.prefHeightProperty().bind(gameLayout.heightProperty());
+                btn.minWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
+                
                 // changes the cursor when hovering over the button
                 btn.setCursor(Cursor.HAND);
                 
                 // adds reference to the button to the array; and then adds it to the layout at correct positions
                 rectangles[y * tableWidth + x] = btn;
-
+                App.stage.minWidthProperty().bind(App.scene.heightProperty().multiply((tableWidth)/tableHeight).add(SIDEBAR_WIDTH));
                 gameLayout.add(btn, x+1, y +1); // "+1" as I'll soon add labels at x = 0 and y = 0;
 
                 // Rectangle input handling
