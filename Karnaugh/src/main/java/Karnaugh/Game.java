@@ -112,12 +112,10 @@ public class Game{
 
     public void startGame() throws IOException {
 
-        // TUTAJ ŁADUJE POZIOMY
-        loadLevel(0);
+        loadLevel(3);
 
         score = 0;
         System.out.println("Starting game");
-        karnaugh = new KarnaughTable(tableBitSizeX, tableBitSizeY, tableValueCount, minPatternSize, wildFieldChance, replacementSourcesSet);
 
         System.out.println("Starting timer");
         secondsRemaining = timeLimitMax;    // Thread safe, no threads just yet
@@ -155,18 +153,15 @@ public class Game{
         sidebarLayout.setId("sidebar");
         
         // thanks to these scaling works. I think
-        gameLayout.minWidthProperty().bind(App.scene.heightProperty().multiply(tableWidth/tableHeight));
+        gameLayout.minWidthProperty().bind(App.scene.heightProperty());
         leftPad.prefWidthProperty().bind(rightPad.prefWidthProperty());
-
-
         
         wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
-        wholeLayout.setHgrow(leftPad, Priority. ALWAYS);
-        wholeLayout.setHgrow(sidebarLayout, Priority.NEVER);
+        wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
 
         sidebarLayout.setMinWidth(SIDEBAR_WIDTH);
         sidebarLayout.setPrefWidth(SIDEBAR_WIDTH);
-        
+
 
         sidebarLayout.setAlignment(Pos.BASELINE_CENTER);
 
@@ -189,7 +184,6 @@ public class Game{
                 id = "rectangle";
 
                 // the 4 following if statements are used to implement "mirrors" by coloring borders
-                // yes, this shouldn't exist
                 if((x+1)%4 == 0 && x!=tableWidth - 1){
                     id += "_right";
                 }
@@ -210,16 +204,14 @@ public class Game{
 
                 btn.setId(id);
 
-                // makes buttons resize as window, and thus gameLayout, resize
-                btn.prefHeightProperty().bind(gameLayout.heightProperty());
-                btn.minWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
-                
-                App.stage.minWidthProperty().bind(App.scene.heightProperty().multiply((tableWidth)/tableHeight).add(SIDEBAR_WIDTH));
+                // sets base size of the buttons, actually useless
+                btn.setPrefHeight(480/tableHeight);
+                btn.setPrefWidth(480/tableWidth);
 
+                // makes buttons resize with window, and thus gameLayout, resizing
+                btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(tableWidth));
+                btn.prefWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
 
-                wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
-                wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
-                
                 // changes the cursor when hovering over the button
                 btn.setCursor(Cursor.HAND);
                 
@@ -256,7 +248,7 @@ public class Game{
                 });
 
             }
-   
+
         }
         
 
@@ -288,21 +280,25 @@ public class Game{
 
         updateTable();
     }
-    
 
-    // Extracts hex color string from a string following the template: "-fx-backgrond-color: #ffffff;" 
+
+// Extracts hex color string from a string following the template: "-fx-backgrond-color: #ffffff;" 
     public String getColorFromStyle(String style){
         return style.substring(style.length() - 7,style.length() - 1);
     }
 
-    // Returns background color as a string with hex code for color (RGB)
+// Returns background color as a string with hex code for color (RGB)
     public String getTileColor(int x, int y){
         return getColorFromStyle(getRectangleAt(x, y).getStyle());
     }
 
-    // Sets background color to a color corresponding to hex string given as an argument (6 characters (a-f 0-9))
+// Sets background color to a color corresponding to hex string given as an argument (6 characters (a-f 0-9))
     void setTileColor(int x, int y, String color) {
-        getRectangleAt(x, y).setStyle("-fx-background-color: #" + color + ";");
+        try
+        {
+            getRectangleAt(x, y).setStyle("-fx-background-color: #" + color + ";");
+        }
+        catch(Exception e){}
     }
 
     // Highlights a tile by desaturating it. Highlighted tiles can be cleared using removeHighlights()
@@ -380,9 +376,16 @@ public class Game{
 
     void trySwapTiles(Coord firstTile, Coord secondTile) {
         removeHighlights();
-        
+
         // Makes sure that tiles are swapped only "1 bit away"
         if(!karnaugh.adjacentFields(firstTile).contains(secondTile)){
+            unlockClicking();
+            return;
+        }
+
+        // Makes sure that none of the tiles is a blockade
+        if(karnaugh.get(firstTile).equals(KarnaughTable.blockadeField) || karnaugh.get(secondTile).equals(KarnaughTable.blockadeField))
+        {
             unlockClicking();
             return;
         }
@@ -414,7 +417,7 @@ public class Game{
             tilesToDestroy = new ArrayList<Coord>();
             for(Coord tile : movedTiles) {
                 int lastSize = tilesToDestroy.size();
-                
+
                 ArrayList<Coord> toAdd = karnaugh.fieldsToDestroy(tile);
                 toAdd.removeAll(tilesToDestroy); // Removing duplicates
                 tilesToDestroy.addAll(toAdd);
@@ -463,6 +466,12 @@ public class Game{
 
         } while(!tilesToDestroy.isEmpty());
 
+        if(!karnaugh.isMovePossible())
+        {
+            karnaugh.reroll();
+            updateTable();
+        }
+
         System.out.println("TEST UNLOCK 1 " + areClicksLocked());
         unlockClicking();
         System.out.println("TEST UNLOCK 2 " + areClicksLocked());
@@ -504,9 +513,9 @@ public class Game{
     void loadLevelDataFromFile(final File file) throws IOException {
 
         HashMap<String, String> values = new HashMap<String, String>();
-        HashMap<Coord, String> specialTiles = new HashMap<Coord, String>();
-        ArrayList<Integer> tileRarityWeights = new ArrayList<Integer>();
-        
+        HashMap<Coord, String> specialTilesTypes = new HashMap<Coord, String>();
+        HashSet<Coord> specialTilesCoords = new HashSet<Coord>();
+        //ArrayList<Integer> tileRarityWeights = new ArrayList<Integer>();
         Scanner scanner = new Scanner(file);
 
         while (scanner.hasNextLine()) {
@@ -516,13 +525,14 @@ public class Game{
                     for(int i = 0; i < Integer.parseInt(values.get("special tile count")); ++i) {
                         line = scanner.nextLine().split(" ");
                         Coord coord = new Coord(Integer.parseInt(line[0]), Integer.parseInt(line[1]));
-                        specialTiles.put(coord, line[2]);
+                        specialTilesCoords.add(coord);
+                        specialTilesTypes.put(coord, line[2]);
                     }
                     break;
-                case "tile probabilities:":
+                /*case "tile probabilities:":
                     for(int i = 0; i < Integer.parseInt(values.get("tile type count")); ++i)
                         tileRarityWeights.add(Integer.parseInt(scanner.nextLine()));
-                    break;
+                    break;*/
                 default:
                     if(line.length >= 2)
                         values.put(line[0], line[1]);
@@ -553,6 +563,24 @@ public class Game{
         // Unused for now
         replacementSourcesSet = new HashSet<ReplacementSource>(Arrays.asList(new ReplacementSource[] { ReplacementSource.Top, ReplacementSource.Bottom }));
         
+        karnaugh = new KarnaughTable(tableBitSizeX, tableBitSizeY, tableValueCount, minPatternSize, wildFieldChance, replacementSourcesSet);
+        boolean shouldReroll = false;
+        for(Coord coord : specialTilesCoords)
+        {
+            switch(specialTilesTypes.get(coord))
+            {
+                case "block":
+                    karnaugh.set(coord, KarnaughTable.blockadeField);
+                    shouldReroll = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        if(shouldReroll)
+        {
+            karnaugh.reroll();
+        }
     }
 
     ArrayList<File> listFilesForFolder(final File folder) throws IOException {

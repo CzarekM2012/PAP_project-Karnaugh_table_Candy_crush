@@ -1,23 +1,11 @@
 name = level 1
-bitSizeX = 3
-bitSizeY = 3
-min pattern size = 4
+bitSizeX = 2
+bitSizeY = 1
+tile type count = 5
+min pattern size = 2
 gravity type = 1
-wild tile frequency = 0.05
-special tile count = 4
-time limit max = 99
+wild tile frequency = 0.00
+time limit max = 50
 time gain per tile = 4
 time gain min = 0.1
 time gain decrease = 0.03
-special tiles:
-2 2 block
-2 5 block
-5 2 block
-5 5 block
-use tile custom rarity = 1
-tile type count = 4
-tile probabilities:
-4
-2
-2
-1
