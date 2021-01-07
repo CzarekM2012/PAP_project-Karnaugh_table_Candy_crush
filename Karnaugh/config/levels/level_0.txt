@@ -1,4 +1,4 @@
-name = Sinkhole
+name = Classic
 bitSizeX = 3
 bitSizeY = 3
 tile type count = 4

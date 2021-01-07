@@ -430,11 +430,8 @@ public class Game{
             updateTable();
 
             addScore(tilesToDestroy.size());
-            System.out.println("TEST1");
             increaseCountdown(tilesToDestroy.size());
-            System.out.println("TEST2");
             updateCountdown();
-            System.out.println("TEST3");
             removeHighlights();
 
             // Destroy
@@ -467,9 +464,7 @@ public class Game{
             updateTable();
         }
 
-        System.out.println("TEST UNLOCK 1 " + areClicksLocked());
         unlockClicking();
-        System.out.println("TEST UNLOCK 2 " + areClicksLocked());
     }
 
     // Adds a value to score, more of a placeholder for now

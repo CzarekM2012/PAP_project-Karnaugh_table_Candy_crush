@@ -7,7 +7,7 @@
 
 <VBox stylesheets="@menu.css" alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="karnaugh.MenuController">
    <children>
-      <Label fx:id="gameTitle" text="Bekarnaughed" />
+      <Label fx:id="gameTitle" text="" />
       <Button fx:id="startButton" text="Start Game" onAction="#startClicked"/>
       <Button fx:id="highscoreButton" text="Highscores" onAction="#highscoreClicked"/>
       <Button fx:id="quitButton" text="Quit game" onAction="#quitClicked"/>

@@ -1,4 +1,4 @@
-name = level 3
+name = Rectangle
 bitSizeX = 4
 bitSizeY = 3
 tile type count = 3
@@ -9,9 +9,4 @@ time limit max = 100
 time gain per tile = 4
 time gain min = 0.1
 time gain decrease = 0.03
-special tile count = 4
-special tiles:
-2 2 block
-2 5 block
-5 2 block
-5 5 block
+difficulty = Hard

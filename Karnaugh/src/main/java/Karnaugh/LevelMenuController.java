@@ -219,16 +219,10 @@ public class LevelMenuController {
 
 
         KarnaughTable karnaugh = new KarnaughTable(game.tableBitSizeX, game.tableBitSizeY, game.tableValueCount, game.minPatternSize, game.wildFieldChance, game.replacementSourcesSet);
-        boolean shouldReroll = false;
         for(Coord coord : specialTiles)
-        {
             karnaugh.set(coord, KarnaughTable.blockadeField);
-            shouldReroll = true;
-        }
-        if(shouldReroll)
-        {
-            karnaugh.reroll();
-        }
+        
+        karnaugh.reroll();
 
         game.startGame(karnaugh);
         
