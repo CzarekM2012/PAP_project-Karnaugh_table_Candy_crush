@@ -59,8 +59,8 @@ public class Game{
     float timeGainDecrease;                 // How fast will time gain decrease (0.1 means 0.1s per second)
     Set<ReplacementSource> replacementSourcesSet;
 
-    Label scoreLabel = new Label("0");
-    Label timeLabel = new Label("0");
+    Label scoreLabel = new Label("Score: 0");
+    Label timeLabel = new Label("Time: ");
 
     // Layout
     final int ANIMATION_DELAY = 50;
@@ -279,11 +279,7 @@ public class Game{
         timeLabel.setId("time_label");
         
         sidebarLayout.getChildren().add(mainMenuButton);
-
-        sidebarLayout.getChildren().add(scoreText);
         sidebarLayout.getChildren().add(scoreLabel);
-
-        sidebarLayout.getChildren().add(timeText);
         sidebarLayout.getChildren().add(timeLabel);
 
         
@@ -496,7 +492,7 @@ public class Game{
     void updateScore(){
         Platform.runLater(new Runnable() {
             @Override public void run() {
-                scoreLabel.setText(Integer.toString(score));     
+                scoreLabel.setText("Score: " + Integer.toString(score));     
             }
           });
     }
@@ -504,7 +500,7 @@ public class Game{
     void updateTime() {
         Platform.runLater(new Runnable() {
             @Override public void run() {
-                timeLabel.setText(Integer.toString((int)secondsRemaining));     
+                timeLabel.setText("Time: " + Integer.toString((int)secondsRemaining));     
             }
           });
     }
