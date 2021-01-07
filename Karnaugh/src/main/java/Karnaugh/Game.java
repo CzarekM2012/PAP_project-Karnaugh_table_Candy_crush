@@ -154,15 +154,18 @@ public class Game{
         sidebarLayout.setId("sidebar");
         
         // thanks to these scaling works. I think
-        gameLayout.minWidthProperty().bind(App.scene.heightProperty());
+        gameLayout.minWidthProperty().bind(App.scene.heightProperty().multiply(tableWidth/tableHeight));
         leftPad.prefWidthProperty().bind(rightPad.prefWidthProperty());
+
+
         
         wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
-        wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
+        wholeLayout.setHgrow(leftPad, Priority. ALWAYS);
+        wholeLayout.setHgrow(sidebarLayout, Priority.NEVER);
 
         sidebarLayout.setMinWidth(SIDEBAR_WIDTH);
         sidebarLayout.setPrefWidth(SIDEBAR_WIDTH);
-
+        
 
         sidebarLayout.setAlignment(Pos.BASELINE_CENTER);
 
@@ -185,6 +188,7 @@ public class Game{
                 id = "rectangle";
 
                 // the 4 following if statements are used to implement "mirrors" by coloring borders
+                // yes, this shouldn't exist
                 if((x+1)%4 == 0 && x!=tableWidth - 1){
                     id += "_right";
                 }
@@ -205,14 +209,16 @@ public class Game{
 
                 btn.setId(id);
 
-                // sets base size of the buttons, actually useless
-                btn.setPrefHeight(480/tableHeight);
-                btn.setPrefWidth(480/tableWidth);
+                // makes buttons resize as window, and thus gameLayout, resize
+                btn.prefHeightProperty().bind(gameLayout.heightProperty());
+                btn.minWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
+                
+                App.stage.minWidthProperty().bind(App.scene.heightProperty().multiply((tableWidth)/tableHeight).add(SIDEBAR_WIDTH));
 
-                // makes buttons resize with window, and thus gameLayout, resizing
-                btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(tableWidth));
-                btn.prefWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
 
+                wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
+                wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
+                
                 // changes the cursor when hovering over the button
                 btn.setCursor(Cursor.HAND);
                 
@@ -233,7 +239,7 @@ public class Game{
                         final int xOfRctg = (int) (((event.getSceneX()) - leftPad.getWidth())/ btn.getWidth()); // x coordinate of the rectangle
                         final int yOfRctg = (int) ((event.getSceneY())/ btn.getHeight()); 
             
-                        //System.out.println("Button at (" + xOfRctg +", " + yOfRctg + ") clicked.");
+                        System.out.println("Button at (" + xOfRctg +", " + yOfRctg + ") clicked.");
 						
                         // Game functions are started in a separate thread to keep the UI responsive
                         Task<Void> task = new Task<Void>() {
@@ -278,6 +284,8 @@ public class Game{
         // changes root of the scene to wholeLayout - the "topmost" parent layer of the game "scene"
         App.setLayoutAsScene(wholeLayout);
 
+
+        App.stage.sizeToScene();
         updateTable();
 
     }

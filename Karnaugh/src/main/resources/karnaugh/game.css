@@ -1,6 +1,7 @@
 .root{
     -fx-background-image: url('./images/padding.jpg');
     -fx-background-size: cover;
+    -fx-preserve-ratio: true;
 }
 
 #main_menu_button{

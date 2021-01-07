@@ -93,18 +93,23 @@ public class App extends Application {
         // }
     }
 
+    static public double aspectRatio = 5/3;
+    static public Stage stage;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
         // Preparing window
-        primaryStage.setTitle("Karnaugh");
+        primaryStage.setTitle("Bekarnaughed");
         primaryStage.setMinWidth(640);
         primaryStage.setMinHeight(480);
 
-        primaryStage.minWidthProperty().bind(primaryStage.heightProperty().multiply(4/3));
-
+        stage = primaryStage;
+        primaryStage.minWidthProperty().bind(primaryStage.heightProperty().multiply(aspectRatio));
+        
         scene = new Scene(loadFXML("menu"), 640, 480);
-        primaryStage.setScene(scene);  
+
+        primaryStage.setScene(scene);
+        
         
     /*  Reference on how to add properties to nodes by fxid
         scene.lookup("#startButton").setOnMouseClicked(new EventHandler<MouseEvent>() {
