@@ -60,7 +60,7 @@ public class Game{
     Set<ReplacementSource> replacementSourcesSet;
 
     Label scoreLabel = new Label("0");
-
+    Label timeLabel = new Label("0");
 
     // Layout
     final int ANIMATION_DELAY = 50;
@@ -101,6 +101,7 @@ public class Game{
         secondsRemaining += timeGain * times;
         if(secondsRemaining > timeLimitMax)
             secondsRemaining = timeLimitMax;
+        
     }
     synchronized void decreaseCountdown() {secondsRemaining -= 1;}
     synchronized void setGameLost() {lost = true;}
@@ -132,6 +133,7 @@ public class Game{
                     updateCountdown();
                     decreaseCountdown();
                     decreaseTimeGain();
+                    updateTime();
                 }
             }
         };
@@ -270,9 +272,13 @@ public class Game{
         });
         
         sidebarLayout.getChildren().add(mainMenuButton);
+        sidebarLayout.getChildren().add(new Label(""));
+        sidebarLayout.getChildren().add(new Label(""));
+        sidebarLayout.getChildren().add(new Label(""));
         sidebarLayout.getChildren().add(new Label("Score:"));
         sidebarLayout.getChildren().add(scoreLabel);
-
+        sidebarLayout.getChildren().add(new Label("Time:"));
+        sidebarLayout.getChildren().add(timeLabel);
         // applies .css styling to the scene
         App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
 
@@ -480,7 +486,19 @@ public class Game{
     }
 
     void updateScore(){
-        scoreLabel.setText(Integer.toString(score));
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                scoreLabel.setText(Integer.toString(score));     
+            }
+          });
+    }
+
+    void updateTime() {
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                timeLabel.setText(Integer.toString((int)secondsRemaining));     
+            }
+          });
     }
 
 
