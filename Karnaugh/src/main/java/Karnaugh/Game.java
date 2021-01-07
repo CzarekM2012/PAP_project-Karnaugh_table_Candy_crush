@@ -213,7 +213,7 @@ public class Game{
                 
                 // adds reference to the button to the array; and then adds it to the layout at correct positions
                 rectangles[y * tableWidth + x] = btn;
-                App.stage.minWidthProperty().bind(App.scene.heightProperty().multiply((tableWidth)/tableHeight).add(SIDEBAR_WIDTH));
+                App.stage.minWidthProperty().bind(App.scene.heightProperty().multiply((tableWidth)/tableHeight).add(SIDEBAR_WIDTH + 100));
                 gameLayout.add(btn, x+1, y +1); // "+1" as I'll soon add labels at x = 0 and y = 0;
 
                 // Rectangle input handling
