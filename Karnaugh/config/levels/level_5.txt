@@ -1,4 +1,4 @@
-name = level 3
+name = level 5
 bitSizeX = 4
 bitSizeY = 4
 tile type count = 5
