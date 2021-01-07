@@ -146,7 +146,7 @@ public class Game{
         Pane rightPad = new Pane();
         
         GridPane gameLayout = new GridPane(); // rectangle containing more rectangles (buttons actually), game happens there
-        VBox sidebarLayout = new VBox(); // main menu button, score, etc.
+        VBox sidebarLayout = new VBox(10); // main menu button, score, etc.
 
         wholeLayout.getChildren().addAll(leftPad, gameLayout, sidebarLayout, rightPad); // Adds all "sublayouts" to the "main layout" in order
 
@@ -266,15 +266,27 @@ public class Game{
 
             }
         });
+
+
+
+        Label scoreText = new Label("Score:");
+        Label timeText = new Label("Time:");
+
+        scoreText.setId("score_label");
+        timeText.setId("time_label");
+
+        scoreLabel.setId("score_label");
+        timeLabel.setId("time_label");
         
         sidebarLayout.getChildren().add(mainMenuButton);
-        sidebarLayout.getChildren().add(new Label(""));
-        sidebarLayout.getChildren().add(new Label(""));
-        sidebarLayout.getChildren().add(new Label(""));
-        sidebarLayout.getChildren().add(new Label("Score:"));
+
+        sidebarLayout.getChildren().add(scoreText);
         sidebarLayout.getChildren().add(scoreLabel);
-        sidebarLayout.getChildren().add(new Label("Time:"));
+
+        sidebarLayout.getChildren().add(timeText);
         sidebarLayout.getChildren().add(timeLabel);
+
+        
         // applies .css styling to the scene
         App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
 

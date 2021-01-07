@@ -112,3 +112,12 @@
     -fx-fill: #cd7f32;
     -fx-font-size: 25pt;
 }
+
+
+#score_label{
+    -fx-font-size: 20pt;
+}
+
+#time_label{
+    -fx-font-size: 20pt;
+}
