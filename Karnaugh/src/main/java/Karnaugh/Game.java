@@ -59,16 +59,16 @@ public class Game{
     float timeGainDecrease;                 // How fast will time gain decrease (0.1 means 0.1s per second)
     Set<ReplacementSource> replacementSourcesSet;
 
-    Label scoreLabel = new Label("0");
-    Label timeLabel = new Label("0");
+    Label scoreLabel = new Label("Score: 0");
+    Label timeLabel = new Label("Time: ");
 
     // Layout
     final int ANIMATION_DELAY = 50;
     final int SIDEBAR_WIDTH = 160; // Maximal width of the sidebar containing main menu button, score, etc.
 
     // Input handling
-    static Coord lastSelectedTile = null;
-    volatile static boolean lockClicking = false;
+    Coord lastSelectedTile = null;
+    boolean lockClicking = false;
 
     // Main data structures
     KarnaughTable karnaugh;                                             // represents logic beneath the game
@@ -146,7 +146,7 @@ public class Game{
         Pane rightPad = new Pane();
         
         GridPane gameLayout = new GridPane(); // rectangle containing more rectangles (buttons actually), game happens there
-        VBox sidebarLayout = new VBox(); // main menu button, score, etc.
+        VBox sidebarLayout = new VBox(10); // main menu button, score, etc.
 
         wholeLayout.getChildren().addAll(leftPad, gameLayout, sidebarLayout, rightPad); // Adds all "sublayouts" to the "main layout" in order
 
@@ -215,7 +215,7 @@ public class Game{
                 
                 // adds reference to the button to the array; and then adds it to the layout at correct positions
                 rectangles[y * tableWidth + x] = btn;
-                App.stage.minWidthProperty().bind(App.scene.heightProperty().multiply((tableWidth)/tableHeight).add(SIDEBAR_WIDTH));
+                App.stage.minWidthProperty().bind(App.scene.heightProperty().multiply((tableWidth)/tableHeight).add(SIDEBAR_WIDTH + 100));
                 gameLayout.add(btn, x+1, y +1); // "+1" as I'll soon add labels at x = 0 and y = 0;
 
                 // Rectangle input handling
@@ -266,15 +266,23 @@ public class Game{
 
             }
         });
+
+
+
+        Label scoreText = new Label("Score:");
+        Label timeText = new Label("Time:");
+
+        scoreText.setId("score_label");
+        timeText.setId("time_label");
+
+        scoreLabel.setId("score_label");
+        timeLabel.setId("time_label");
         
         sidebarLayout.getChildren().add(mainMenuButton);
-        sidebarLayout.getChildren().add(new Label(""));
-        sidebarLayout.getChildren().add(new Label(""));
-        sidebarLayout.getChildren().add(new Label(""));
-        sidebarLayout.getChildren().add(new Label("Score:"));
         sidebarLayout.getChildren().add(scoreLabel);
-        sidebarLayout.getChildren().add(new Label("Time:"));
         sidebarLayout.getChildren().add(timeLabel);
+
+        
         // applies .css styling to the scene
         App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
 
@@ -484,7 +492,7 @@ public class Game{
     void updateScore(){
         Platform.runLater(new Runnable() {
             @Override public void run() {
-                scoreLabel.setText(Integer.toString(score));     
+                scoreLabel.setText("Score: " + Integer.toString(score));     
             }
           });
     }
@@ -492,7 +500,7 @@ public class Game{
     void updateTime() {
         Platform.runLater(new Runnable() {
             @Override public void run() {
-                timeLabel.setText(Integer.toString((int)secondsRemaining));     
+                timeLabel.setText("Time: " + Integer.toString((int)secondsRemaining));     
             }
           });
     }
