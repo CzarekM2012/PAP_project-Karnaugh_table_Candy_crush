@@ -19,6 +19,7 @@ import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -57,6 +58,9 @@ public class Game{
     float timeGainMin;                        // How far time gain per pattern can be reduced (seconds) 
     float timeGainDecrease;                 // How fast will time gain decrease (0.1 means 0.1s per second)
     Set<ReplacementSource> replacementSourcesSet;
+
+    Label scoreLabel = new Label("0");
+
 
     // Layout
     final int ANIMATION_DELAY = 50;
@@ -266,6 +270,8 @@ public class Game{
         });
         
         sidebarLayout.getChildren().add(mainMenuButton);
+        sidebarLayout.getChildren().add(new Label("Score:"));
+        sidebarLayout.getChildren().add(scoreLabel);
 
         // applies .css styling to the scene
         App.scene.getStylesheets().addAll(this.getClass().getResource("game.css").toExternalForm());
@@ -473,9 +479,10 @@ public class Game{
         updateScore();
     }
 
-    void updateScore() {
-        //scoreTextField.setText(Integer.toString(score));
+    void updateScore(){
+        scoreLabel.setText(Integer.toString(score));
     }
+
 
     // Just a tiny function to make code cleaner
     void sleep(int timeMs) {
