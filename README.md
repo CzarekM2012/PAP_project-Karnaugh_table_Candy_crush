@@ -4,7 +4,7 @@
 ## Java match-3-like game
 ### Installation:
 1. Install OpenJDK 11 from [here][Java download page]
-2. Download whole Karnauh/release folder
+2. Download whole Karnaugh/release folder
 3. Run a script in Karnaugh/release/ that launches program (run_windows.bat or .sh) or open karnaugh.jar file using the JDK ('OpenJDK Platform binary')
 
 ### Creating levels
