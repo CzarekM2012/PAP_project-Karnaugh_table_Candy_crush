@@ -149,18 +149,15 @@ public class Game{
         sidebarLayout.setId("sidebar");
         
         // thanks to these scaling works. I think
-        gameLayout.minWidthProperty().bind(App.scene.heightProperty().multiply(tableWidth/tableHeight));
+        gameLayout.minWidthProperty().bind(App.scene.heightProperty());
         leftPad.prefWidthProperty().bind(rightPad.prefWidthProperty());
-
-
         
         wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
-        wholeLayout.setHgrow(leftPad, Priority. ALWAYS);
-        wholeLayout.setHgrow(sidebarLayout, Priority.NEVER);
+        wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
 
         sidebarLayout.setMinWidth(SIDEBAR_WIDTH);
         sidebarLayout.setPrefWidth(SIDEBAR_WIDTH);
-        
+
 
         sidebarLayout.setAlignment(Pos.BASELINE_CENTER);
 
@@ -183,7 +180,6 @@ public class Game{
                 id = "rectangle";
 
                 // the 4 following if statements are used to implement "mirrors" by coloring borders
-                // yes, this shouldn't exist
                 if((x+1)%4 == 0 && x!=tableWidth - 1){
                     id += "_right";
                 }
@@ -204,16 +200,14 @@ public class Game{
 
                 btn.setId(id);
 
-                // makes buttons resize as window, and thus gameLayout, resize
-                btn.prefHeightProperty().bind(gameLayout.heightProperty());
-                btn.minWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
-                
-                App.stage.minWidthProperty().bind(App.scene.heightProperty().multiply((tableWidth)/tableHeight).add(SIDEBAR_WIDTH));
+                // sets base size of the buttons, actually useless
+                btn.setPrefHeight(480/tableHeight);
+                btn.setPrefWidth(480/tableWidth);
 
+                // makes buttons resize with window, and thus gameLayout, resizing
+                btn.prefHeightProperty().bind(gameLayout.heightProperty().divide(tableWidth));
+                btn.prefWidthProperty().bind(gameLayout.heightProperty().divide(tableHeight));
 
-                wholeLayout.setHgrow(leftPad, Priority.ALWAYS);
-                wholeLayout.setHgrow(rightPad, Priority.ALWAYS);
-                
                 // changes the cursor when hovering over the button
                 btn.setCursor(Cursor.HAND);
                 
@@ -250,7 +244,7 @@ public class Game{
                 });
 
             }
-   
+
         }
         
 
@@ -281,21 +275,25 @@ public class Game{
         
         updateTable();
     }
-    
 
-    // Extracts hex color string from a string following the template: "-fx-backgrond-color: #ffffff;" 
+
+// Extracts hex color string from a string following the template: "-fx-backgrond-color: #ffffff;" 
     public String getColorFromStyle(String style){
         return style.substring(style.length() - 7,style.length() - 1);
     }
 
-    // Returns background color as a string with hex code for color (RGB)
+// Returns background color as a string with hex code for color (RGB)
     public String getTileColor(int x, int y){
         return getColorFromStyle(getRectangleAt(x, y).getStyle());
     }
 
-    // Sets background color to a color corresponding to hex string given as an argument (6 characters (a-f 0-9))
+// Sets background color to a color corresponding to hex string given as an argument (6 characters (a-f 0-9))
     void setTileColor(int x, int y, String color) {
-        getRectangleAt(x, y).setStyle("-fx-background-color: #" + color + ";");
+        try
+        {
+            getRectangleAt(x, y).setStyle("-fx-background-color: #" + color + ";");
+        }
+        catch(Exception e){}
     }
 
     // Highlights a tile by desaturating it. Highlighted tiles can be cleared using removeHighlights()
@@ -373,9 +371,16 @@ public class Game{
 
     void trySwapTiles(Coord firstTile, Coord secondTile) {
         removeHighlights();
-        
+
         // Makes sure that tiles are swapped only "1 bit away"
         if(!karnaugh.adjacentFields(firstTile).contains(secondTile)){
+            unlockClicking();
+            return;
+        }
+
+        // Makes sure that none of the tiles is a blockade
+        if(karnaugh.get(firstTile).equals(KarnaughTable.blockadeField) || karnaugh.get(secondTile).equals(KarnaughTable.blockadeField))
+        {
             unlockClicking();
             return;
         }
@@ -407,7 +412,7 @@ public class Game{
             tilesToDestroy = new ArrayList<Coord>();
             for(Coord tile : movedTiles) {
                 int lastSize = tilesToDestroy.size();
-                
+
                 ArrayList<Coord> toAdd = karnaugh.fieldsToDestroy(tile);
                 toAdd.removeAll(tilesToDestroy); // Removing duplicates
                 tilesToDestroy.addAll(toAdd);
@@ -455,6 +460,12 @@ public class Game{
             removeHighlights();
 
         } while(!tilesToDestroy.isEmpty());
+
+        if(!karnaugh.isMovePossible())
+        {
+            karnaugh.reroll();
+            updateTable();
+        }
 
         System.out.println("TEST UNLOCK 1 " + areClicksLocked());
         unlockClicking();

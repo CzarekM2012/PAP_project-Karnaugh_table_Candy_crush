@@ -50,14 +50,23 @@ public class KarnaughTable {
             }
 
             // Setting field values
-            try
+            boolean needToClear = false;
+            do
             {
-                prepareBoardWithNoPatterns();
-            }
-            catch(AssertionError e)
-            {
-                throw e;
-            }
+                if(needToClear)
+                {
+                    this.clear();
+                }
+                try
+                {
+                    prepareBoardWithNoPatterns();
+                    needToClear = true;
+                }
+                catch(AssertionError e)
+                {
+                    throw e;
+                }
+            }while(!isMovePossible());
         }
         else
         {
@@ -201,6 +210,41 @@ public class KarnaughTable {
             }
         }
         return filledTiles;
+    }
+
+    /** clears board prepares board with no patterns and inserts blockades in places they were before*/
+    public void reroll()
+    {
+        ArrayList<Coord> blockadesCoords = new ArrayList<Coord>();
+        for(int i=0; i<xSize; i++)
+        {
+            for(int j=0; j<ySize; j++)
+            {
+                if(board[i][j].equals(blockadeField))
+                {
+                    blockadesCoords.add(new Coord(i, j));
+                }
+            }
+        }
+        boolean succeeded;
+        do
+        {
+            succeeded = true;
+            this.clear();
+            try
+            {
+                this.prepareBoardWithNoPatterns();
+            }
+            catch(AssertionError e)
+            {
+                succeeded = false;
+            }
+            for(Coord blockadeCoord : blockadesCoords)
+            {
+                this.set(blockadeCoord, blockadeField);
+            }
+        }
+        while(!succeeded || !isMovePossible());
     }
 
     /** Runs collapse(replacementSource) 
@@ -685,6 +729,10 @@ public class KarnaughTable {
             }
         }
         return copy;
+    }
+    public Field get(Coord coord)
+    {
+        return new Field(board[coord.x][coord.y]);
     }
 
     public int getSizeX() {return xSize;}
